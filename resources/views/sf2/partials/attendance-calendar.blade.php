@@ -21,7 +21,7 @@
                 <button type="button" class="btn btn-outline-danger sf2-cal-mode active" data-mode="absent">Absent</button>
                 <button type="button" class="btn btn-outline-warning sf2-cal-mode" data-mode="tardy">Tardy</button>
             </div>
-            <button type="button" class="btn btn-sm btn-link sf2-cal-clear p-0">Clear days</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary sf2-cal-clear">Clear days</button>
         </div>
         <div class="sf2-cal-grid"></div>
         <div class="sf2-cal-legend">

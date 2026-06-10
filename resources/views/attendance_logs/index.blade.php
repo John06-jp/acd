@@ -5,9 +5,9 @@
 @section('content')
 <div class="attendance-logs-page">
     <div class="al-toolbar">
-        <a href="{{ route('attendance_logs.reports.hub') }}" class="export-btn">📊Patron reports</a>
-        <a href="{{ route('attendance_logs.export.pdf', request()->query()) }}" class="export-btn">📕Export PDF</a>
-        <a href="{{ route('attendance_logs.export.excel', request()->query()) }}" class="export-btn">📗Export Excel</a>
+        <a href="{{ route('attendance_logs.reports.hub') }}" class="export-btn"><i class="bi bi-bar-chart-fill"></i> Patron reports</a>
+        <a href="{{ route('attendance_logs.export.pdf', request()->query()) }}" class="export-btn export-btn--pdf"><i class="bi bi-file-earmark-pdf-fill"></i> Export PDF</a>
+        <a href="{{ route('attendance_logs.export.excel', request()->query()) }}" class="export-btn export-btn--excel"><i class="bi bi-file-earmark-excel-fill"></i> Export Excel</a>
     </div>
 
     <div class="al-filters no-bg">
@@ -54,13 +54,13 @@
             <div class="al-field" style="flex:0 1 auto;">
                 <label>Status</label>
                 <div class="al-status-btns">
-                    <button type="submit" name="status" value="IN" class="al-btn-in">IN Only</button>
-                    <button type="submit" name="status" value="OUT" class="al-btn-out">OUT Only</button>
+                    <button type="submit" name="status" value="IN" class="al-btn al-btn-in"><i class="bi bi-box-arrow-in-right"></i> IN Only</button>
+                    <button type="submit" name="status" value="OUT" class="al-btn al-btn-out"><i class="bi bi-box-arrow-left"></i> OUT Only</button>
                 </div>
             </div>
             <div class="al-field" style="flex:0 1 auto;">
                 <label>&nbsp;</label>
-                <button type="submit" class="btn-search">Search</button>
+                <button type="submit" class="btn-search"><i class="bi bi-search"></i> Search</button>
             </div>
         </form>
     </div>
