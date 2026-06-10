@@ -1,7 +1,10 @@
 document.querySelectorAll("[data-bs-toggle='collapse']").forEach(btn => {
     btn.addEventListener("click", () => {
-        let target = document.querySelector(btn.dataset.bsTarget);
+        const target = document.querySelector(btn.dataset.bsTarget);
         target.classList.toggle("hidden");
+        // Rotate chevron on the parent card
+        const card = btn.closest('.prsp-program-card, .prsp-year-card');
+        if (card) card.classList.toggle('open');
     });
 });
 
@@ -207,9 +210,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (response.ok) {
                 let data = await response.json();
-                // Update the display text
-                document.getElementById("program-name-" + data.id).textContent =
-                    `${data.program_code} — ${data.program_name}`;
+                const badge = document.getElementById("program-badge-" + data.id);
+                const name  = document.getElementById("program-name-"  + data.id);
+                if (badge) badge.textContent = data.program_code;
+                if (name)  name.textContent  = data.program_name;
 
                 closeProgramEditModal();
                 showToast("Program Updated 🎓");
@@ -251,7 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (response.ok) {
                 let data = await response.json();
                 // Remove the program card from DOM
-                const programDiv = document.getElementById("program-name-" + data.id)?.closest(".bg-white.rounded.shadow.mb-6");
+                const programDiv = document.getElementById("program-badge-" + data.id)?.closest(".prsp-program-card");
                 if (programDiv) programDiv.remove();
     
                 closeProgramDeleteModal();

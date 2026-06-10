@@ -1,3 +1,33 @@
+.sf2-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 36px;
+  padding: 0.42rem 0.75rem;
+  border: 1px solid rgba(157, 166, 180, 0.22);
+  border-radius: 8px;
+  background: #29abe2;
+  color: var(--brand-primary-darker, white);
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  box-shadow: 0 6px 16px rgba(18, 90, 130, 0.08);
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.sf2-back-link:hover {
+  border-color: var(--brand-primary, #29abe2);
+  background: #edf8fd;
+  color: var(--brand-primary-darker, #125a82);
+  transform: translateY(-1px);
+}
+
+.sf2-back-link:focus-visible {
+  outline: 3px solid rgba(41, 171, 226, 0.25);
+  outline-offset: 2px;
+}
+
 .sf2-attendance-cal {
   margin-top: 0.25rem;
 }
@@ -37,7 +67,7 @@
   font-size: 0.65rem;
   font-weight: 600;
   text-align: center;
-  color: #6c757d;
+  color:#6c757d;
   padding: 2px 0;
 }
 

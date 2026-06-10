@@ -1,24 +1,44 @@
 @extends('layouts.main')
 
-@section('styles')
-    <link rel="stylesheet" href="{{ asset('css/books/index.css') }}">
-    <style>
-        .faq-header h2,
-        .faq-subtitle,
-        .faq-item {
-            font-family: var(--brand-font-family, 'Inter', sans-serif);
-        }
-        .faq-header h2 {
-            font-size: 2rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-    </style>
-@endsection
+@push('page-styles')
+<style>
+    .faq-header h2,
+    .faq-subtitle,
+    .faq-item {
+        font-family: var(--brand-font-family, 'Inter', sans-serif);
+    }
+    .faq-header h2 { letter-spacing: -0.02em; }
+    .home-actions {
+        display: flex;
+        justify-content: center;
+        margin: 0 auto 28px;
+        width: 100%;
+    }
+    .home-scanner-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        min-height: 44px;
+        padding: 0.7rem 1.2rem;
+        border-radius: 8px;
+        background: var(--brand-button-bg, #29abe2);
+        color: var(--brand-button-text, #fff);
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 8px 18px rgba(18, 90, 130, 0.16);
+    }
+    .home-scanner-link:hover {
+        background: var(--brand-button-hover-bg, #1a8fc4);
+        color: var(--brand-button-hover-text, #fff);
+    }
+</style>
+@endpush
 
 @section('content')
     <section class="faq-section">
         <div class="faq-container">
+
             <div class="faq-header">
                 <h2>Frequently Asked Questions</h2>
             </div>
@@ -70,11 +90,4 @@
     </section>
 @endsection
 
-@section('footer')
-    <footer>
-        <div class="a51-footer">
-            <h4 style="color: white; font-size:15px">Pantas &copy; {{ date('Y') }}. All Rights Reserved.</h4>
-        </div>
-    </footer>
-@endsection
 

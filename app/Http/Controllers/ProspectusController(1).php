@@ -103,32 +103,16 @@ class ProspectusController extends Controller
 }
 
 public function storeSubject(Request $request)
-{
-    $validated = $request->validate([
-        'course' => 'required|string|max:255',
-        'year' => 'required|string|max:255',
-        'subject' => 'required|string|max:255',
-    ]);
-
-    Prospectus::create($validated);
-
-    return redirect()->route('prospectus.index', ['course' => $validated['course']])
-                     ->with('success', 'Subject added successfully!');
-}
-
-}
-_code,
-            'program_name' => $program->program_name,
-        ]);
-    }
-    
-    public function destroyProgram(Program $program)
     {
-        $program->delete();
-    
-        return response()->json([
-            'success' => true,
-            'id' => $program->id
+        $validated = $request->validate([
+            'course' => 'required|string|max:255',
+            'year' => 'required|string|max:255',
+            'subject' => 'required|string|max:255',
         ]);
+
+        Prospectus::create($validated);
+
+        return redirect()->route('prospectus.index', ['course' => $validated['course']])
+                         ->with('success', 'Subject added successfully!');
     }
 }

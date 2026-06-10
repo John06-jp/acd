@@ -5,9 +5,9 @@
 @section('content')
 <div class="attendance-logs-page">
     <div class="al-toolbar">
-        <a href="{{ route('attendance_logs.reports.hub') }}" class="export-btn">Patron reports</a>
-        <a href="{{ route('attendance_logs.export.pdf', request()->query()) }}" class="export-btn">Export PDF</a>
-        <a href="{{ route('attendance_logs.export.excel', request()->query()) }}" class="export-btn">Export Excel</a>
+        <a href="{{ route('attendance_logs.reports.hub') }}" class="export-btn">📊Patron reports</a>
+        <a href="{{ route('attendance_logs.export.pdf', request()->query()) }}" class="export-btn">📕Export PDF</a>
+        <a href="{{ route('attendance_logs.export.excel', request()->query()) }}" class="export-btn">📗Export Excel</a>
     </div>
 
     <div class="al-filters no-bg">

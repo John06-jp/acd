@@ -752,46 +752,46 @@
     
 }
 
-    /*Section layout*/
+    /* ── FAQ section ─────────────────────────────────────────────────────────
+       Responsive FAQ layout: max-width container centered, no fixed px margins
+       ──────────────────────────────────────────────────────────────────────── */
     .faq-section {
-    padding: 80px 20px;
+        padding: clamp(32px, 5vw, 80px) 16px;
     }
 
-    .faq-continer {
-    max-width: 650px;
-    margin: 0 auto;
-    
-    
+    .faq-container {
+        max-width: 720px;
+        margin: 0 auto;
+        width: 100%;
     }
-    
-    /*Header and button*/
+
+    /* Header row */
     .faq-header {
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 30px
-        
-        
+        gap: 0.75rem;
+        margin-bottom: 24px;
     }
-    
+
     .faq-header h2 {
-        font-size: 2rem;
+        font-size: clamp(1.4rem, 3vw, 2rem);
         font-weight: 700;
         color: #000;
-        margin-left: 210px;
-        
+        margin: 0;
     }
-    
+
     .read-more-btn {
         background-color: #1F7A1F;
         color: white;
         font-weight: 600;
         border: none;
         border-radius: 10px;
-        padding: 10px 50px;
+        padding: 10px 32px;
         cursor: pointer;
         transition: background-color 0.3s ease;
-        margin-right: 150px;
+        white-space: nowrap;
     }
 
     .read-more-btn:hover {
@@ -800,7 +800,7 @@
 
     /* Subheader */
     .faq-subtitle {
-        font-size: 1.6rem;
+        font-size: clamp(1.1rem, 2.5vw, 1.6rem);
         font-weight: 600;
         margin-bottom: 20px;
         color: #000;
@@ -817,17 +817,20 @@
     .faq-item {
         background-color: white;
         border: 1px solid #ddd;
-        border-radius: 4px;
+        border-radius: 8px;
         padding: 15px 20px;
         font-size: 1rem;
         color: #222;
         transition: box-shadow 0.2s ease;
-        margin-left: 210px;
-        margin-right: 210px;
     }
 
     .faq-item:hover {
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 575.98px) {
+        .faq-section { padding: 24px 12px; }
+        .faq-item { padding: 12px 14px; font-size: 0.925rem; }
     }
     
     

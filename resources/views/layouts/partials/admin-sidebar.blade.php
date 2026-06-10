@@ -1,0 +1,274 @@
+@php
+    $isActive = fn (array $patterns) => collect($patterns)->contains(fn ($pattern) => request()->routeIs($pattern));
+    $user = Auth::user();
+
+    $navLinks = [
+        [
+            'label'    => 'Home',
+            'route'    => 'home',
+            'patterns' => ['home'],
+            'icon'     => 'home',
+        ],
+        [
+            'label'    => 'Attendance',
+            'icon'     => 'calendar-check',
+            'patterns' => ['sf2.*', 'attendance.*', 'attendance_logs.*'],
+            'children' => [
+                ['label' => 'SF2',             'route' => 'sf2.index',                         'patterns' => ['sf2.*'],                                 'icon' => 'book'],
+                ['label' => 'Scanner',         'route' => 'attendance.scan',                   'patterns' => ['attendance.scan', 'attendance.process'], 'icon' => 'scan'],
+                ['label' => 'Attendance Logs', 'route' => 'attendance_logs.index',             'patterns' => ['attendance_logs.index'],                 'icon' => 'clock'],
+                ['label' => 'Reports',         'route' => 'attendance_logs.reports.dashboard', 'patterns' => ['attendance_logs.reports.*'],             'icon' => 'chart'],
+            ],
+        ],
+        [
+            'label'    => 'Data',
+            'icon'     => 'users',
+            'patterns' => ['students.*', 'pending.index', 'students.pending', 'employees.*', 'pending.employees'],
+            'children' => [
+                ['label' => 'Students',  'route' => 'students.index',  'patterns' => ['students.*', 'pending.index', 'students.pending'], 'icon' => 'users'],
+                ['label' => 'Employees', 'route' => 'employees.index', 'patterns' => ['employees.*', 'pending.employees'],                'icon' => 'badge'],
+            ],
+        ],
+        [
+            'label'    => 'Communication',
+            'icon'     => 'message',
+            'patterns' => ['feedback.index', 'sms.*'],
+            'children' => [
+                ['label' => 'Feedback',        'route' => 'feedback.index',  'patterns' => ['feedback.index'],                            'icon' => 'message'],
+                ['label' => 'SMS Blast',       'route' => 'sms.page',        'patterns' => ['sms.page', 'sms.send'],                      'icon' => 'send'],
+                ['label' => 'Scanner Message', 'route' => 'sms.scanMessage', 'patterns' => ['sms.scanMessage', 'sms.scanMessage.update'], 'icon' => 'settings'],
+            ],
+        ],
+    ];
+
+    $adminChildren = [
+        ['label' => 'Prospectus', 'route' => 'prospectus.index', 'patterns' => ['prospectus.*'], 'icon' => 'grid'],
+        ['label' => 'Files',      'route' => 'files.index',      'patterns' => ['files.*'],      'icon' => 'folder'],
+        [
+            'label'    => 'Accounts',
+            'icon'     => 'user-plus',
+            'patterns' => ['users.*'],
+            'children' => [
+                ['label' => 'Create Account', 'route' => 'users.create', 'patterns' => ['users.create', 'users.store'], 'icon' => 'user-plus'],
+                ['label' => 'View Accounts',  'route' => 'users.index',  'patterns' => ['users.index', 'users.edit'],   'icon' => 'list'],
+            ],
+        ],
+    ];
+
+    $icon = function (string $name) {
+        return match ($name) {
+            'home'      => '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/>',
+            'book'      => '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 5.5v16"/><path d="M8 7h8"/>',
+            'scan'            => '<path d="M7 3H4a1 1 0 0 0-1 1v3"/><path d="M17 3h3a1 1 0 0 1 1 1v3"/><path d="M7 21H4a1 1 0 0 1-1-1v-3"/><path d="M17 21h3a1 1 0 0 0 1-1v-3"/><path d="M8 12h8"/>',
+            'calendar-check'  => '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/>',
+            'clock'     => '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+            'chart'     => '<path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 16v-5"/><path d="M12 16V8"/><path d="M16 16v-3"/>',
+            'users'     => '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+            'badge'     => '<rect x="4" y="5" width="16" height="14" rx="2"/><path d="M9 9h6"/><path d="M9 13h6"/>',
+            'message'   => '<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>',
+            'send'      => '<path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/>',
+            'settings'  => '<path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M2 14h4"/><path d="M10 8h4"/><path d="M18 16h4"/>',
+            'grid'      => '<path d="M4 4h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6H4z"/><path d="M14 14h6v6h-6z"/>',
+            'folder'    => '<path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+            'user-plus' => '<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6"/><path d="M23 11h-6"/>',
+            'list'      => '<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>',
+            'shield'    => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+            default     => '<circle cx="12" cy="12" r="9"/>',
+        };
+    };
+@endphp
+
+@once
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggle = document.querySelector('[data-admin-sidebar-toggle]');
+            const overlay = document.querySelector('[data-admin-sidebar-overlay]');
+            const collapseBtn = document.getElementById('sidebarCollapseBtn');
+            const body = document.body;
+
+            /* ── Mobile open/close ── */
+            const setOpen = (open) => body.classList.toggle('admin-sidebar-open', open);
+            toggle?.addEventListener('click', () => setOpen(!body.classList.contains('admin-sidebar-open')));
+            overlay?.addEventListener('click', () => setOpen(false));
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 992) setOpen(false);
+            });
+
+            /* ── Desktop collapse ── */
+            const STORAGE_KEY = 'pantas-sidebar-collapsed';
+            const closeAllSubmenus = () => {
+                document.querySelectorAll('.admin-sidebar-item.open, .admin-sidebar-subitem.open').forEach(item => {
+                    item.classList.remove('open');
+                    item.querySelector('[aria-expanded]')?.setAttribute('aria-expanded', 'false');
+                });
+            };
+            const setCollapsed = (collapsed) => {
+                body.classList.toggle('sidebar-collapsed', collapsed);
+                if (collapsed) closeAllSubmenus();
+                try { localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0'); } catch (_) {}
+            };
+
+            try {
+                if (localStorage.getItem(STORAGE_KEY) === '1') body.classList.add('sidebar-collapsed');
+            } catch (_) {}
+
+            collapseBtn?.addEventListener('click', () => setCollapsed(!body.classList.contains('sidebar-collapsed')));
+
+            /* ── Submenu accordions (level 1 & 2) ── */
+            document.querySelectorAll('.admin-sidebar-link--parent').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (body.classList.contains('sidebar-collapsed')) return;
+                    const item = btn.closest('.admin-sidebar-item, .admin-sidebar-subitem');
+                    if (!item) return;
+                    const isOpen = item.classList.toggle('open');
+                    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                });
+            });
+        });
+    </script>
+@endonce
+
+<button class="admin-sidebar-toggle" type="button" aria-label="Open admin menu" data-admin-sidebar-toggle>
+    <span></span><span></span><span></span>
+</button>
+
+<div class="admin-sidebar-overlay" data-admin-sidebar-overlay></div>
+
+<aside class="admin-sidebar" aria-label="Admin sidebar">
+    <a href="{{ route('home') }}" class="admin-sidebar-brand">
+        <img src="{{ asset('images/pantasLogo.png') }}"
+             alt="Assumption College of Davao"
+             class="admin-sidebar-brand-img"
+             width="3905" height="1056">
+        <span class="admin-sidebar-brand-seal" aria-hidden="true">
+            <img src="{{ asset('images/pantasLogo.png') }}" alt="" width="3905" height="1056">
+        </span>
+        <span class="admin-sidebar-brand-role">
+            {{ ucfirst($user->role ?? 'Admin') }} Dashboard
+        </span>
+    </a>
+
+    <nav class="admin-sidebar-nav">
+
+        {{-- ── Main navigation ── --}}
+        @foreach($navLinks as $link)
+            @php
+                $hasChildren    = !empty($link['children']);
+                $linkActive     = $isActive($link['patterns']);
+                $anyChildActive = $hasChildren && collect($link['children'])->contains(fn($c) => $isActive($c['patterns']));
+                $open           = $linkActive || $anyChildActive;
+            @endphp
+
+            @if($hasChildren)
+                <div class="admin-sidebar-item {{ $open ? 'open' : '' }}">
+                    <button class="admin-sidebar-link admin-sidebar-link--parent {{ $open ? 'active' : '' }}"
+                            type="button" aria-expanded="{{ $open ? 'true' : 'false' }}"
+                            title="{{ $link['label'] }}">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">{!! $icon($link['icon']) !!}</svg>
+                        <span>{{ $link['label'] }}</span>
+                        <svg class="admin-sidebar-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    <div class="admin-sidebar-submenu">
+                        @foreach($link['children'] as $child)
+                            @php $childActive = $isActive($child['patterns']); @endphp
+                            <a href="{{ route($child['route']) }}"
+                               class="admin-sidebar-link admin-sidebar-link--child {{ $childActive ? 'active' : '' }}"
+                               title="{{ $child['label'] }}"
+                               @if($childActive) aria-current="page" @endif>
+                                <svg viewBox="0 0 24 24" aria-hidden="true">{!! $icon($child['icon']) !!}</svg>
+                                <span>{{ $child['label'] }}</span>  
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @else
+                <a href="{{ route($link['route']) }}"
+                   class="admin-sidebar-link {{ $linkActive ? 'active' : '' }}"
+                   title="{{ $link['label'] }}"
+                   @if($linkActive) aria-current="page" @endif>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">{!! $icon($link['icon']) !!}</svg>
+                    <span>{{ $link['label'] }}</span>
+                    <svg class="admin-sidebar-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                </a>
+            @endif
+        @endforeach
+
+        {{-- ── Admin dropdown (isAdmin only) ── --}}
+        @can('isAdmin')
+            @php
+                $adminActive = collect($adminChildren)->contains(function ($child) use ($isActive) {
+                    if ($isActive($child['patterns'])) return true;
+                    return !empty($child['children']) && collect($child['children'])->contains(fn($gc) => $isActive($gc['patterns']));
+                });
+            @endphp
+            <div class="admin-sidebar-item {{ $adminActive ? 'open' : '' }}">
+                <button class="admin-sidebar-link admin-sidebar-link--parent {{ $adminActive ? 'active' : '' }}"
+                        type="button" aria-expanded="{{ $adminActive ? 'true' : 'false' }}"
+                        title="Admin">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">{!! $icon('shield') !!}</svg>
+                    <span>Admin</span>
+                    <svg class="admin-sidebar-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <div class="admin-sidebar-submenu">
+                    @foreach($adminChildren as $child)
+                        @php
+                            $childHasChildren = !empty($child['children']);
+                            $childActive      = $isActive($child['patterns']);
+                            $anyGrandActive   = $childHasChildren && collect($child['children'])->contains(fn($gc) => $isActive($gc['patterns']));
+                            $childOpen        = $childActive || $anyGrandActive;
+                        @endphp
+
+                        @if($childHasChildren)
+                            <div class="admin-sidebar-subitem {{ $childOpen ? 'open' : '' }}">
+                                <button class="admin-sidebar-link admin-sidebar-link--child admin-sidebar-link--parent {{ $childOpen ? 'active' : '' }}"
+                                        type="button" aria-expanded="{{ $childOpen ? 'true' : 'false' }}"
+                                        title="{{ $child['label'] }}">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">{!! $icon($child['icon']) !!}</svg>
+                                    <span>{{ $child['label'] }}</span>
+                                    <svg class="admin-sidebar-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                                </button>
+                                <div class="admin-sidebar-subsubmenu">
+                                    @foreach($child['children'] as $grandchild)
+                                        @php $gcActive = $isActive($grandchild['patterns']); @endphp
+                                        <a href="{{ route($grandchild['route']) }}"
+                                           class="admin-sidebar-link admin-sidebar-link--child {{ $gcActive ? 'active' : '' }}"
+                                           title="{{ $grandchild['label'] }}"
+                                           @if($gcActive) aria-current="page" @endif>
+                                            <svg viewBox="0 0 24 24" aria-hidden="true">{!! $icon($grandchild['icon']) !!}</svg>
+                                            <span>{{ $grandchild['label'] }}</span>
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @else
+                            <a href="{{ route($child['route']) }}"
+                               class="admin-sidebar-link admin-sidebar-link--child {{ $childActive ? 'active' : '' }}"
+                               title="{{ $child['label'] }}"
+                               @if($childActive) aria-current="page" @endif>
+                                <svg viewBox="0 0 24 24" aria-hidden="true">{!! $icon($child['icon']) !!}</svg>
+                                <span>{{ $child['label'] }}</span>
+                            </a>
+                        @endif
+                    @endforeach
+                </div>
+            </div>
+        @endcan
+
+    </nav>
+
+    <div class="admin-sidebar-user">
+        <div class="admin-sidebar-avatar" title="{{ $user->name }}">
+            {{ strtoupper(substr($user->fname ?? $user->name ?? 'A', 0, 1)) }}
+        </div>
+        <div class="admin-sidebar-user-copy">
+            <strong>{{ $user->name }}</strong>
+            <span>{{ ucfirst($user->role ?? 'Staff') }}</span>
+        </div>
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button type="submit" aria-label="Log out" title="Log out">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M21 19V5a2 2 0 0 0-2-2h-4"/></svg>
+            </button>
+        </form>
+    </div>
+</aside>

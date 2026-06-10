@@ -4,40 +4,51 @@ body.scan-kiosk-page {
       display: flex;
       flex-direction: column;
       height: 100vh;
+      min-height: 100vh;
+      overflow: hidden;
       background: var(--brand-page-bg, #f4f9fc);
     }
 
     .header {
       background: #ffffff;
-      padding: 10px 20px;
+      padding: 10px clamp(14px, 2vw, 28px);
       display: flex;
       align-items: center;
       border-bottom: 3px solid var(--brand-primary, #29abe2);
+      box-shadow: 0 4px 18px rgba(18, 90, 130, 0.08);
+      z-index: 2;
     }
 
     .header .logo-title {
-      display: flex;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
       align-items: center;
-      gap: 15px;
+      gap: clamp(10px, 2vw, 24px);
       width: 100%;
-      justify-content: space-between;
     }
 
     .header img {
-      height: 4rem;
+      height: clamp(40px, 5vw, 64px);
       width: auto;
-      margin-left: 3rem;
+      max-width: min(220px, 34vw);
+      margin-left: 0;
+      object-fit: contain;
     }
 
     .header .system-title {
-      font-size: clamp(14px, 2.5vw, 32px);
+      justify-self: center;
+      min-width: 0;
+      font-size: clamp(16px, 2.2vw, 30px);
       font-weight: 700;
       color: var(--brand-primary-darker, #125a82);
       text-transform: uppercase;
       letter-spacing: 1px;
       font-family: 'Poppins', sans-serif;
-      text-align: right;
-      padding-right: 1rem;
+      text-align: center;
+      padding-right: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .footer1{
@@ -108,47 +119,66 @@ body.scan-kiosk-page {
       }
     }
     .home-button {
-            display: inline-block;
-            margin: 20px;
-            padding: 10px 20px;
-            background-color: var(--brand-button-bg, #29abe2);
-            color: var(--brand-button-text, #ffffff);
-            transition: color 0.3s, transform 0.3s;
-            text-decoration: none;
-            border-radius: 10px;
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 9px 18px;
+      border: 0;
+      border-radius: 8px;
+      background-color: var(--brand-primary-darker, #125a82);
+      color: #ffffff;
+      cursor: pointer;
+      font-family: var(--brand-font-family, 'Poppins', Arial, sans-serif);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+      box-shadow: 0 8px 18px rgba(18, 90, 130, 0.16);
+      transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
     }
 
     .home-button:hover {
-            background-color: var(--brand-button-hover-bg, #1a8fc4);
-            color: var(--brand-button-text, #ffffff);
+      background-color: var(--brand-button-hover-bg, #1a8fc4);
+      color: var(--brand-button-hover-text, #ffffff);
+      transform: translateY(-1px);
+    }
+
+    .home-button:focus-visible {
+      outline: 3px solid rgba(41, 171, 226, 0.35);
+      outline-offset: 2px;
     }
 
     .main {
       display: flex;
       flex: 1;
+      min-height: 0;
     }
 
     .sidebar {
-      width: 350px;
+      width: clamp(300px, 28vw, 380px);
       background: linear-gradient(180deg, var(--brand-primary, #29abe2) 0%, var(--brand-primary-dark, #1a8fc4) 100%);
       color: #ffffff;
-      padding: 20px;
+      padding: clamp(18px, 2vw, 28px);
       display: flex;
       flex-direction: column;
       align-items: center;
+      box-shadow: 8px 0 28px rgba(18, 90, 130, 0.16);
+      z-index: 1;
     }
     .name-box{
-      width: 350px;
-      height: 10rem;
-      margin-top: 2rem;
+      width: 100%;
+      min-height: 10rem;
+      margin-top: clamp(18px, 3vh, 32px);
       background: #ffffff;
-      border-top-left-radius: 30px;
-      border-top-right-radius: 30px;
-      padding: 20px;
+      border-radius: 18px;
+      padding: 22px 18px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+      justify-content: center;
+      box-shadow: 0 16px 34px rgba(18, 90, 130, 0.18);
     }
 
     .sidebar .name-box .label,
@@ -162,7 +192,7 @@ body.scan-kiosk-page {
     }
 
     .time {
-      font-size: 28px;
+      font-size: clamp(28px, 3vw, 42px);
       font-weight: bold;
       color: #ffffff;
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
@@ -170,9 +200,9 @@ body.scan-kiosk-page {
     }
 
     .profile-pic {
-      width: 200px;
-      height: 200px;
-      border-radius: 10px;
+      width: clamp(160px, 16vw, 220px);
+      height: clamp(160px, 16vw, 220px);
+      border-radius: 20px;
       background-color: #ffffff;
       overflow: hidden;
       margin-bottom: 20px;
@@ -180,6 +210,8 @@ body.scan-kiosk-page {
       align-items: center;
       justify-content: center;
       position: relative;
+      border: 6px solid rgba(255, 255, 255, 0.55);
+      box-shadow: 0 16px 34px rgba(18, 90, 130, 0.22);
     }
 
     .profile-pic img {
@@ -191,7 +223,7 @@ body.scan-kiosk-page {
     .student-name {
           color: #1e293b;
           font-weight: bold;
-          font-size: 2rem;
+          font-size: clamp(1.3rem, 2.4vw, 2rem);
           word-wrap: break-word;
           overflow-wrap: break-word;
           text-align: center;
@@ -211,10 +243,11 @@ body.scan-kiosk-page {
     }
 
     .status-button {
-      font-size: 25px;
+      width: min(100%, 260px);
+      font-size: clamp(1rem, 2vw, 1.55rem);
       background: var(--brand-primary-darker, #125a82);
       color: #ffffff;
-      padding: 8px 100px;
+      padding: 9px 18px;
       border-radius: 25px;
       font-weight: bold;
       text-align: center;
@@ -231,13 +264,17 @@ body.scan-kiosk-page {
       display: flex;
       align-items: center;
       justify-content: center;
+      min-width: 0;
+      padding: clamp(16px, 3vw, 42px);
     }
     .right-content video,
     .right-content iframe {
-      max-width: 90%;
+      max-width: min(92%, 1180px);
+      max-height: 78vh;
       border: 3px solid var(--brand-primary, #29abe2);
-      border-radius: 12px;
+      border-radius: 18px;
       box-shadow: 0 8px 32px rgba(41, 171, 226, 0.25);
+      background: #ffffff;
     }
 
     .scan-animation {
@@ -471,56 +508,61 @@ body.scan-kiosk-page {
     }
     
     * {
-    border-radius: 0 !important;
-    
-    
-}
+      box-sizing: border-box;
+    }
 @media(max-width: 1280px){
     .header img {
         height: 3rem;
         width: auto;
-        margin-left: 2.5rem;
     }
 }
 @media(max-width: 1024px){
     .header img{
         height: 2rem;
         width: auto;
-        margin-left: 2rem;
     }
     .header .system-title{
         font-size: 25px;
     }
     
-    .sidebar{
-        width: 300px;
-        
-    }
     .profile-pic{
         width: 160px;
-        height: auto;
+        height: 160px;
     }
 }
 @media(max-width: 768px){
+    body.scan-kiosk-page {
+        overflow: auto;
+    }
+    .header .logo-title {
+        grid-template-columns: auto 1fr;
+    }
     .header img{
         height: 1.5rem;
         width: auto;
-        margin-left: 1.5rem;
     }
     .header{
         text-align: center;
     }
     .header .system-title{
-        font-size: 23px;
+        justify-self: end;
+        font-size: clamp(14px, 4vw, 22px);
     }
-    
+    .home-button {
+        grid-column: 1 / -1;
+        justify-self: center;
+        width: min(100%, 220px);
+    }
+    .main{
+        flex-direction: column;
+    }
     .sidebar{
-        width: 350px;
-        
+        width: 100%;
+        min-height: auto;
     }
     .profile-pic{
         width: 140px;
-        height: auto;
+        height: 140px;
     }
     .ads-vid{
         width: 100%;
@@ -531,7 +573,6 @@ body.scan-kiosk-page {
 @media(max-width: 398px){
     .main{
         display: flex;
-        direction: row;
     }
     .header{
         text-align: center;
@@ -539,15 +580,14 @@ body.scan-kiosk-page {
     .header img{
         height: 1rem;
         width: auto;
-        margin-left: 1rem;
     }
     .header .system-title{
         font-size: 12px;
     }
     .home-button{
-        font-size: 8;
-        padding: 5px 15px;
-        border: none;
+        min-height: 34px;
+        padding: 6px 10px;
+        font-size: 0.72rem;
     }
     
     .sidebar{

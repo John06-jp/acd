@@ -364,21 +364,34 @@
 .al-btn-in {
     padding: 0.5rem 1rem;
     background: #16a34a;
+    width: 9rem;
+    padding: 10px;
     color: #fff;
     border: none;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-weight: 600;
     cursor: pointer;
 }
+.al-btn-in:hover {
+    background-color: #41de41;
+    color: #22333b;
+}
 
 .al-btn-out {
     padding: 0.5rem 1rem;
     background: #dc2626;
     color: #fff;
+    border-collapse: 2px black;
+    width: 9rem;
+    padding: 10px;
     border: none;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-weight: 600;
     cursor: pointer;
+}
+.al-btn-out:hover {
+    background-color: #ff2020;
+    color: #22333b;
 }
 
 .al-table-wrap {
@@ -437,16 +450,19 @@
 }
 
 .btn-search{
-    background-color: #1F7A1F;
+    background-color: rgb(18, 80, 226);
     color: white;
     transition: color 0.3s, transform 0.3s;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 13px;
+    font-weight: 600;
+    font-size: 16px;
     padding: 10px;
     align-items: center;
+    width: 9rem;
+   border: none;
 }
 .btn-search:hover{
-    background-color: #ffb845;
+    background-color: #1a83e5;
     color: #22333b;
 }
 

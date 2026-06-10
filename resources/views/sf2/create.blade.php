@@ -8,7 +8,7 @@
 
 @section('content')
 <div class="mb-3">
-    <a href="{{ route('sf2.index') }}" class="text-decoration-none small">&larr; Back to SF2 list</a>
+    <a href="{{ route('sf2.index') }}" class="sf2-back-link">&larr; Back to SF2 list</a>
     <h4 class="mt-2 mb-1">Create SF2 report</h4>
     <p class="text-muted small">Enter school details and learner names, then absent/tardy dates. Download the DepEd-style PDF when done.</p>
 </div>

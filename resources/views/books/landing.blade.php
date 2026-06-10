@@ -3,9 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Library Landing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('public/css/books/landing.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/books/landing.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/layout/navbar.css') }}">
 </head>
 
 <body>
@@ -21,8 +24,35 @@
     </header>
 
     <!-- Hero Banner -->
-    <section class="hero-text">
-        <img src="{{ \App\Support\VersionedAsset::url('images/Bannernew.jpg') }}" alt="Banner" class="banner-img">
+    <section class="hero-text" style="padding:0; margin:0;">
+        <div class="acd-banner" role="banner">
+            <div class="acd-banner-watermark" aria-hidden="true">
+                <img src="{{ asset('images/pantasLogo.png') }}" alt="">
+            </div>
+            <div class="acd-banner-waves" aria-hidden="true">
+                <svg viewBox="0 0 260 180" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMid meet">
+                    <path d="M20 20 Q80 -10 140 20 Q200 50 260 20"  stroke="#1a73e8" stroke-width="1.6" stroke-opacity="0.18" fill="none"/>
+                    <path d="M20 45 Q80 15 140 45 Q200 75 260 45"  stroke="#1a73e8" stroke-width="1.6" stroke-opacity="0.18" fill="none"/>
+                    <path d="M20 70 Q80 40 140 70 Q200 100 260 70" stroke="#1a73e8" stroke-width="1.6" stroke-opacity="0.18" fill="none"/>
+                    <path d="M20 95 Q80 65 140 95 Q200 125 260 95" stroke="#1a73e8" stroke-width="1.6" stroke-opacity="0.18" fill="none"/>
+                    <path d="M20 120 Q80 90 140 120 Q200 150 260 120" stroke="#1a73e8" stroke-width="1.6" stroke-opacity="0.18" fill="none"/>
+                    <path d="M20 145 Q80 115 140 145 Q200 175 260 145" stroke="#1a73e8" stroke-width="1.6" stroke-opacity="0.12" fill="none"/>
+                </svg>
+            </div>
+            <div class="acd-banner-inner">
+                <div class="acd-banner-text">
+                    <h1 class="acd-banner-title">
+                        <span class="acd-banner-line">ASSUMPTION</span>
+                        <span class="acd-banner-line">COLLEGE OF DAVAO</span>
+                    </h1>
+                    <div class="acd-banner-rule" aria-hidden="true"></div>
+                    <p class="acd-banner-powered">POWERED BY PANTAS</p>
+                </div>
+                <div class="acd-banner-seal" aria-label="ACD Seal">
+                    <img src="{{ asset('images/pantasLogo.png') }}" alt="Assumption College of Davao">
+                </div>
+            </div>
+        </div>
     </section>
 
     <h1 style="text-align: center; margin-bottom: 30px; margin-top: 30px;">New Arrival Books</h1>
@@ -68,12 +98,12 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <h3>Courses</h3>
-            <a href="{{ route('landing', ['course' => 'all']) }}" class="{{ request('course', 'all') === 'all' ? 'active' : '' }}">
+            <a href="{{ route('books.landing', ['course' => 'all']) }}" class="{{ request('course', 'all') === 'all' ? 'active' : '' }}">
                 View All
             </a>
 
             @foreach ($courses as $course)
-            <a href="{{ route('landing', ['course' => $course]) }}" class="{{ request('course') === $course ? 'active' : '' }}">
+            <a href="{{ route('books.landing', ['course' => $course]) }}" class="{{ request('course') === $course ? 'active' : '' }}">
                 {{ $course }}
             </a>
             @endforeach

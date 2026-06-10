@@ -1,9 +1,13 @@
 @extends('layouts.app')
 
-@section('styles')
+@push('styles')
     <link rel="stylesheet" href="{{ asset('css/books/index.css') }}">
-@endsection
+@endpush
 
 @section('banner')
-    <img src="{{ \App\Support\VersionedAsset::url('images/Bannernew.jpg') }}" alt="Banner" class="banner-img">
+<img src="{{ asset('images/Bannernew.jpg') }}"
+     alt="Assumption College of Davao — Powered by Pantas"
+     class="acd-banner-photo"
+     width="3905" height="1056"
+     loading="eager">
 @endsection
