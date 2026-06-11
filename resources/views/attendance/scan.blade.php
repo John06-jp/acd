@@ -14,7 +14,6 @@
     <div class="logo-title">
       <img src="{{ asset('images/pantasLogo.png') }}" alt="Logo">
       <div class="system-title">Powered by Pantas</div>
-      <button type="button" class="home-button" onclick="window.location.href='{{ route('home') }}'">Home page</button>
     </div>
   </div>
 </header>

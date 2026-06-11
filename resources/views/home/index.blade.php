@@ -131,7 +131,7 @@
                     </button>
                     <div class="collapse" id="attendanceCollapse" data-bs-parent="#homeFaqAccordion">
                         <div class="faq-answer">
-                            <a href="{{ route('attendance.scan') }}">Open the attendance scanner</a>
+                            <a href="{{ route('attendance.scan') }}" target="attendanceScanner" rel="noopener">Open the attendance scanner</a>
                         </div>
                     </div>
                 </div>
@@ -165,7 +165,7 @@
                 <div class="faq-item">
                     <p><strong>Where do I sign in for attendance?</strong></p>
                     <p class="mb-0 mt-2">
-                        <a href="{{ route('attendance.scan') }}" class="faq-toggle">Open the attendance scanner</a>
+                        <a href="{{ route('attendance.scan') }}" class="faq-toggle" target="attendanceScanner" rel="noopener">Open the attendance scanner</a>
                     </p>
                 </div>
 
