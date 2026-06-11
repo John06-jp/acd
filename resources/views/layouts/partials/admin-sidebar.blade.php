@@ -15,9 +15,12 @@
             'patterns' => ['sf2.*', 'attendance.*', 'attendance_logs.*'],
             'children' => [
                 ['label' => 'SF2',             'route' => 'sf2.index',                         'patterns' => ['sf2.*'],                                 'icon' => 'book'],
-                ['label' => 'Scanner',         'route' => 'attendance.scan',                   'patterns' => ['attendance.scan', 'attendance.process'], 'icon' => 'scan'],
+                ['label' => 'Scanner',         'route' => 'attendance.scan',                   'patterns' => ['attendance.scan', 'attendance.process'], 'icon' => 'scan', 'target' => '_blank'],
                 ['label' => 'Attendance Logs', 'route' => 'attendance_logs.index',             'patterns' => ['attendance_logs.index'],                 'icon' => 'clock'],
                 ['label' => 'Reports',         'route' => 'attendance_logs.reports.dashboard', 'patterns' => ['attendance_logs.reports.*'],             'icon' => 'chart'],
+                ['label' => 'Manage Video',    'route' => 'attendance.changeVideo',            'patterns' => ['attendance.changeVideo', 'attendance.uploadVideo'], 'icon' => 'settings'],
+                ['label' => 'Section Picker',  'route' => 'attendance.section.settings',       'patterns' => ['attendance.section.settings*'],          'icon' => 'settings'],
+                ['label' => 'Logout Feedback', 'route' => 'attendance.feedback.settings',      'patterns' => ['attendance.feedback.settings*'],         'icon' => 'message'],
             ],
         ],
         [
@@ -174,6 +177,7 @@
                             <a href="{{ route($child['route']) }}"
                                class="admin-sidebar-link admin-sidebar-link--child {{ $childActive ? 'active' : '' }}"
                                title="{{ $child['label'] }}"
+                               @if(!empty($child['target'])) target="{{ $child['target'] }}" rel="noopener" @endif
                                @if($childActive) aria-current="page" @endif>
                                 <svg viewBox="0 0 24 24" aria-hidden="true">{!! $icon($child['icon']) !!}</svg>
                                 <span>{{ $child['label'] }}</span>  

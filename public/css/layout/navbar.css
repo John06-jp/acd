@@ -603,15 +603,22 @@
     background: rgb(255, 208, 55);
 }
 
-/* User footer: icon-only */
+/* User footer: icon-only rail */
 .sidebar-collapsed .admin-sidebar-user {
-    grid-template-columns: 1fr;
-    justify-items: center;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     padding: 10px 8px;
-    gap: 0;
+    gap: 6px;
 }
-.sidebar-collapsed .admin-sidebar-user-copy { display: none; }
-.sidebar-collapsed .admin-sidebar-user form { display: none; }
+.sidebar-collapsed .admin-sidebar-logout-btn span { display: none; }
+.sidebar-collapsed .admin-sidebar-logout-btn {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    justify-content: center;
+    border-radius: 50% !important;
+}
 
 .admin-sidebar-brand {
     display: flex;
@@ -779,9 +786,9 @@
 }
 
 .admin-sidebar-user {
-    display: grid;
-    grid-template-columns: 38px 1fr 30px;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
     padding: 10px;
     border-radius: 10px;

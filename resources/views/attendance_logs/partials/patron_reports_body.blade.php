@@ -204,71 +204,249 @@
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
         <script>
-            (function () {
-                if (!window.Chart) return;
+        (function () {
+            if (!window.Chart) return;
 
-                const topInsLabels = @json(collect($topStudentsByIns)->map(fn($r) => trim(($r->lastname ?? '').', '.($r->firstname ?? '')))->values());
-                const topInsCounts = @json(collect($topStudentsByIns)->map(fn($r) => (int) ($r->ins_count ?? 0))->values());
+            /* ── Global defaults ──────────────────────────────────────── */
+            Chart.defaults.font.family = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+            Chart.defaults.font.size   = 12;
+            Chart.defaults.color       = '#374151';
 
-                const distinctLabels = @json(collect($topStudentsByDistinctInDays)->map(fn($r) => trim(($r->lastname ?? '').', '.($r->firstname ?? '')))->values());
-                const distinctCounts = @json(collect($topStudentsByDistinctInDays)->map(fn($r) => (int) ($r->distinct_in_days ?? 0))->values());
+            /* ── Raw data from Blade ──────────────────────────────────── */
+            const topInsLabels    = @json(collect($topStudentsByIns)->map(fn($r) => trim(($r->lastname ?? '').', '.($r->firstname ?? '')))->values());
+            const topInsCounts    = @json(collect($topStudentsByIns)->map(fn($r) => (int) ($r->ins_count ?? 0))->values());
 
-                const progLabels = @json(collect($programAttendanceTotals)->take(12)->map(fn($r) => $r->course ? ($programNameByCode->get($r->course, $r->course)) : '—')->values());
-                const progIns = @json(collect($programAttendanceTotals)->take(12)->map(fn($r) => (int) ($r->ins_count ?? 0))->values());
+            const distinctLabels  = @json(collect($topStudentsByDistinctInDays)->map(fn($r) => trim(($r->lastname ?? '').', '.($r->firstname ?? '')))->values());
+            const distinctCounts  = @json(collect($topStudentsByDistinctInDays)->map(fn($r) => (int) ($r->distinct_in_days ?? 0))->values());
 
-                const weeklyLabels = @json(collect($weeklyInsTrend)->map(fn($r) => (string) ($r->label ?? ''))->values());
-                const weeklyCounts = @json(collect($weeklyInsTrend)->map(fn($r) => (int) ($r->count ?? 0))->values());
+            const progLabels      = @json(collect($programAttendanceTotals)->take(12)->map(fn($r) => $r->course ? ($programNameByCode->get($r->course, $r->course)) : '—')->values());
+            const progIns         = @json(collect($programAttendanceTotals)->take(12)->map(fn($r) => (int) ($r->ins_count ?? 0))->values());
 
-                const monthlyLabels = @json(collect($monthlyInsTrend)->map(fn($r) => (string) ($r->label ?? ''))->values());
-                const monthlyCounts = @json(collect($monthlyInsTrend)->map(fn($r) => (int) ($r->count ?? 0))->values());
+            const weeklyLabels    = @json(collect($weeklyInsTrend)->map(fn($r) => (string) ($r->label ?? ''))->values());
+            const weeklyCounts    = @json(collect($weeklyInsTrend)->map(fn($r) => (int) ($r->count ?? 0))->values());
 
-                const hourLabels = @json(collect($busiestHours)->take(12)->map(fn($r) => (string) ($r->label ?? ''))->values());
-                const hourCounts = @json(collect($busiestHours)->take(12)->map(fn($r) => (int) ($r->count ?? 0))->values());
+            const monthlyLabels   = @json(collect($monthlyInsTrend)->map(fn($r) => (string) ($r->label ?? ''))->values());
+            const monthlyCounts   = @json(collect($monthlyInsTrend)->map(fn($r) => (int) ($r->count ?? 0))->values());
 
-                function makeChart(canvasId, config) {
-                    const el = document.getElementById(canvasId);
-                    if (!el) return;
-                    const ctx = el.getContext('2d');
-                    // eslint-disable-next-line no-new
-                    new Chart(ctx, config);
+            const hourLabels      = @json(collect($busiestHours)->take(12)->map(fn($r) => (string) ($r->label ?? ''))->values());
+            const hourCounts      = @json(collect($busiestHours)->take(12)->map(fn($r) => (int) ($r->count ?? 0))->values());
+
+            /* ── Helpers ──────────────────────────────────────────────── */
+            const gridColor = 'rgba(0,0,0,0.06)';
+
+            function areaGradient(canvasEl, rgbTop, rgbBottom) {
+                const ctx = canvasEl.getContext('2d');
+                const g   = ctx.createLinearGradient(0, 0, 0, canvasEl.offsetHeight || 240);
+                g.addColorStop(0, rgbTop);
+                g.addColorStop(1, rgbBottom);
+                return g;
+            }
+
+            function multiColor(palette, count) {
+                return Array.from({ length: count }, (_, i) => palette[i % palette.length]);
+            }
+
+            function tooltip(isHoriz = false) {
+                return {
+                    backgroundColor : 'rgba(15,23,42,0.9)',
+                    padding         : 10,
+                    cornerRadius    : 8,
+                    titleFont       : { weight: '700', size: 12 },
+                    bodyFont        : { size: 12 },
+                    callbacks: {
+                        label: ctx => '  ' + (isHoriz ? ctx.parsed.x : ctx.parsed.y).toLocaleString()
+                    }
+                };
+            }
+
+            function makeChart(id, config) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                new Chart(el, config);
+            }
+
+            /* ── 1. Top INs — horizontal bar ──────────────────────────── */
+            makeChart('chartTopIns', {
+                type: 'bar',
+                data: {
+                    labels: topInsLabels,
+                    datasets: [{
+                        label          : 'IN scans',
+                        data           : topInsCounts,
+                        backgroundColor: 'rgba(41,171,226,0.75)',
+                        borderColor    : '#29abe2',
+                        borderWidth    : 1.5,
+                        borderRadius   : 6,
+                        borderSkipped  : false,
+                    }]
+                },
+                options: {
+                    indexAxis        : 'y',
+                    responsive       : true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: gridColor }, ticks: { callback: v => v.toLocaleString() } },
+                        y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+                    },
+                    plugins: { legend: { display: false }, tooltip: tooltip(true) }
                 }
+            });
 
-                makeChart('chartTopIns', {
-                    type: 'bar',
-                    data: { labels: topInsLabels, datasets: [{ label: 'IN scans', data: topInsCounts, backgroundColor: 'rgba(13,110,253,0.45)', borderColor: 'rgba(13,110,253,1)', borderWidth: 1 }] },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
-                });
+            /* ── 2. Distinct IN days — horizontal bar ─────────────────── */
+            makeChart('chartDistinctDays', {
+                type: 'bar',
+                data: {
+                    labels: distinctLabels,
+                    datasets: [{
+                        label          : 'Days with IN',
+                        data           : distinctCounts,
+                        backgroundColor: 'rgba(16,185,129,0.75)',
+                        borderColor    : '#10b981',
+                        borderWidth    : 1.5,
+                        borderRadius   : 6,
+                        borderSkipped  : false,
+                    }]
+                },
+                options: {
+                    indexAxis        : 'y',
+                    responsive       : true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: gridColor }, ticks: { callback: v => v.toLocaleString() } },
+                        y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+                    },
+                    plugins: { legend: { display: false }, tooltip: tooltip(true) }
+                }
+            });
 
-                makeChart('chartDistinctDays', {
-                    type: 'bar',
-                    data: { labels: distinctLabels, datasets: [{ label: 'Days with IN', data: distinctCounts, backgroundColor: 'rgba(25,135,84,0.45)', borderColor: 'rgba(25,135,84,1)', borderWidth: 1 }] },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
-                });
+            /* ── 3. Program totals — multi-colour vertical bar ────────── */
+            const progPalette = [
+                'rgba(41,171,226,0.8)','rgba(16,185,129,0.8)','rgba(245,158,11,0.8)',
+                'rgba(239,68,68,0.8)', 'rgba(99,102,241,0.8)','rgba(236,72,153,0.8)',
+                'rgba(20,184,166,0.8)','rgba(249,115,22,0.8)','rgba(139,92,246,0.8)',
+                'rgba(6,182,212,0.8)', 'rgba(132,204,22,0.8)','rgba(234,179,8,0.8)',
+            ];
+            makeChart('chartProgramTotals', {
+                type: 'bar',
+                data: {
+                    labels: progLabels,
+                    datasets: [{
+                        label          : 'IN scans',
+                        data           : progIns,
+                        backgroundColor: multiColor(progPalette, progLabels.length),
+                        borderColor    : multiColor(progPalette, progLabels.length).map(c => c.replace('0.8)', '1)')),
+                        borderWidth    : 1.5,
+                        borderRadius   : 6,
+                        borderSkipped  : false,
+                    }]
+                },
+                options: {
+                    responsive       : true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { display: false }, ticks: { maxRotation: 40, font: { size: 11 } } },
+                        y: { beginAtZero: true, grid: { color: gridColor }, ticks: { callback: v => v.toLocaleString() } }
+                    },
+                    plugins: { legend: { display: false }, tooltip: tooltip(false) }
+                }
+            });
 
-                makeChart('chartProgramTotals', {
-                    type: 'bar',
-                    data: { labels: progLabels, datasets: [{ label: 'IN scans', data: progIns, backgroundColor: 'rgba(255,193,7,0.5)', borderColor: 'rgba(255,193,7,1)', borderWidth: 1 }] },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
-                });
-
+            /* ── 4. Weekly trend — smooth area line ───────────────────── */
+            const weeklyEl = document.getElementById('chartWeeklyTrend');
+            if (weeklyEl) {
                 makeChart('chartWeeklyTrend', {
                     type: 'line',
-                    data: { labels: weeklyLabels, datasets: [{ label: 'IN scans', data: weeklyCounts, borderColor: 'rgba(13,110,253,1)', backgroundColor: 'rgba(13,110,253,0.2)', tension: 0.25, fill: true, pointRadius: 2 }] },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+                    data: {
+                        labels: weeklyLabels,
+                        datasets: [{
+                            label          : 'IN scans',
+                            data           : weeklyCounts,
+                            borderColor    : '#6366f1',
+                            backgroundColor: areaGradient(weeklyEl, 'rgba(99,102,241,0.35)', 'rgba(99,102,241,0.02)'),
+                            borderWidth    : 2.5,
+                            tension        : 0.4,
+                            fill           : true,
+                            pointRadius    : 4,
+                            pointBackgroundColor: '#6366f1',
+                            pointHoverRadius: 6,
+                        }]
+                    },
+                    options: {
+                        responsive       : true,
+                        maintainAspectRatio: false,
+                        interaction      : { mode: 'index', intersect: false },
+                        scales: {
+                            x: { grid: { color: gridColor }, ticks: { maxRotation: 40, font: { size: 11 } } },
+                            y: { beginAtZero: true, grid: { color: gridColor }, ticks: { callback: v => v.toLocaleString() } }
+                        },
+                        plugins: { legend: { display: false }, tooltip: tooltip(false) }
+                    }
                 });
+            }
 
+            /* ── 5. Monthly trend — smooth area line ──────────────────── */
+            const monthlyEl = document.getElementById('chartMonthlyTrend');
+            if (monthlyEl) {
                 makeChart('chartMonthlyTrend', {
                     type: 'line',
-                    data: { labels: monthlyLabels, datasets: [{ label: 'IN scans', data: monthlyCounts, borderColor: 'rgba(220,53,69,1)', backgroundColor: 'rgba(220,53,69,0.2)', tension: 0.25, fill: true, pointRadius: 2 }] },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+                    data: {
+                        labels: monthlyLabels,
+                        datasets: [{
+                            label          : 'IN scans',
+                            data           : monthlyCounts,
+                            borderColor    : '#ef4444',
+                            backgroundColor: areaGradient(monthlyEl, 'rgba(239,68,68,0.3)', 'rgba(239,68,68,0.02)'),
+                            borderWidth    : 2.5,
+                            tension        : 0.4,
+                            fill           : true,
+                            pointRadius    : 4,
+                            pointBackgroundColor: '#ef4444',
+                            pointHoverRadius: 6,
+                        }]
+                    },
+                    options: {
+                        responsive       : true,
+                        maintainAspectRatio: false,
+                        interaction      : { mode: 'index', intersect: false },
+                        scales: {
+                            x: { grid: { color: gridColor }, ticks: { maxRotation: 40, font: { size: 11 } } },
+                            y: { beginAtZero: true, grid: { color: gridColor }, ticks: { callback: v => v.toLocaleString() } }
+                        },
+                        plugins: { legend: { display: false }, tooltip: tooltip(false) }
+                    }
                 });
+            }
 
+            /* ── 6. Busiest hour — vertical bar with purple gradient ──── */
+            const hourEl = document.getElementById('chartBusiestHour');
+            if (hourEl) {
+                const hourGrad = areaGradient(hourEl, 'rgba(139,92,246,0.85)', 'rgba(192,132,252,0.55)');
                 makeChart('chartBusiestHour', {
                     type: 'bar',
-                    data: { labels: hourLabels, datasets: [{ label: 'IN scans', data: hourCounts, backgroundColor: 'rgba(108,117,125,0.45)', borderColor: 'rgba(108,117,125,1)', borderWidth: 1 }] },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
+                    data: {
+                        labels: hourLabels,
+                        datasets: [{
+                            label          : 'IN scans',
+                            data           : hourCounts,
+                            backgroundColor: hourGrad,
+                            borderColor    : '#7c3aed',
+                            borderWidth    : 1.5,
+                            borderRadius   : 6,
+                            borderSkipped  : false,
+                        }]
+                    },
+                    options: {
+                        responsive       : true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+                            y: { beginAtZero: true, grid: { color: gridColor }, ticks: { callback: v => v.toLocaleString() } }
+                        },
+                        plugins: { legend: { display: false }, tooltip: tooltip(false) }
+                    }
                 });
-            })();
+            }
+        })();
         </script>
     @endpush
 @endonce
