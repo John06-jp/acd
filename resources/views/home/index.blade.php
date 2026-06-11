@@ -8,6 +8,7 @@
         font-family: var(--brand-font-family, 'Inter', sans-serif);
     }
     .faq-header h2 { letter-spacing: -0.02em; }
+<<<<<<< HEAD
     .home-actions {
         display: flex;
         justify-content: center;
@@ -88,7 +89,6 @@
 @section('content')
     <section class="faq-section">
         <div class="faq-container">
-
             <div class="faq-header">
                 <h2>Frequently Asked Questions</h2>
             </div>
@@ -180,3 +180,7 @@
         </div>
     </section>
 @endsection
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5303854c859ee39cdf626b3fe5dfdf35811108ae
