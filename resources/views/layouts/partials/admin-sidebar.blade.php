@@ -260,15 +260,41 @@
         <div class="admin-sidebar-avatar" title="{{ $user->name }}">
             {{ strtoupper(substr($user->fname ?? $user->name ?? 'A', 0, 1)) }}
         </div>
-        <div class="admin-sidebar-user-copy">
-            <strong>{{ $user->name }}</strong>
-            <span>{{ ucfirst($user->role ?? 'Staff') }}</span>
-        </div>
-        <form action="{{ route('logout') }}" method="POST">
-            @csrf
-            <button type="submit" aria-label="Log out" title="Log out">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M21 19V5a2 2 0 0 0-2-2h-4"/></svg>
-            </button>
-        </form>
+        <button type="button" class="admin-sidebar-logout-btn" data-bs-toggle="modal" data-bs-target="#logoutModal" aria-label="Log out" title="Log out">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M21 19V5a2 2 0 0 0-2-2h-4"/></svg>
+            <span>Log out</span>
+        </button>
     </div>
 </aside>
+
+<!-- Logout confirmation modal -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:380px">
+        <div class="modal-content" style="border:none;border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.18);">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <div style="width:48px;height:48px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin:0 auto;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M21 19V5a2 2 0 0 0-2-2h-4"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="modal-body text-center px-4 pt-3 pb-2">
+                <h6 class="fw-700 mb-1" style="font-size:1rem;font-weight:700;color:#111;font-family:'Segoe UI',sans-serif;">Sign out</h6>
+                <p class="text-muted mb-0" style="font-size:0.85rem;font-family:'Segoe UI',sans-serif;">Are you sure you want to log out of your account?</p>
+            </div>
+            <div class="modal-footer border-0 px-4 pb-4 pt-2 d-flex gap-2 justify-content-center">
+                <button type="button" class="btn btn-light btn-sm px-4 fw-600" data-bs-dismiss="modal"
+                    style="border-radius:8px;font-weight:600;font-family:'Segoe UI',sans-serif;border:1.5px solid #e5e7eb;">
+                    Cancel
+                </button>
+                <form action="{{ route('logout') }}" method="POST" class="m-0">
+                    @csrf
+                    <button type="submit" class="btn btn-sm px-4"
+                        style="border-radius:8px;background:#dc2626;border:none;color:#fff;font-weight:600;font-family:'Segoe UI',sans-serif;">
+                        Yes, log out
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

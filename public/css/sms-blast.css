@@ -1,5 +1,5 @@
 .sms-blast-page {
-    max-width: 860px;
+    max-width: 2160px;
     padding: 1.5rem 0 2rem;
 }
 
@@ -223,7 +223,7 @@
 
 /* ── Scan SMS message page ── */
 .scan-msg-page {
-    max-width: 860px;
+    max-width: 2160px;
     padding: 1.5rem 0 2rem;
 }
 

@@ -729,12 +729,12 @@
 
 .admin-sidebar-link:hover {
     background: white transparentize(0.9);
-    color: var(--brand-primary, #29abe2);
+    color: #ffffff;
 }
 
 .admin-sidebar-link.active {
-    background: rgba(255, 194, 51, 0.984) ;
-    color: var(--brand-primary-darker, #125a82);
+    background: rgba(255, 194, 51, 0.984) transparentize(0.1) ;
+    color: #ffffff;
     font-weight: 600;
 }
 
@@ -746,7 +746,7 @@
     bottom: 6px;
     width: 3px;
     border-radius: 0 3px 3px 0;
-    background: var(--brand-primary, #29abe2);
+    background: #ffffff;
 }
 
 .admin-sidebar-link svg {
@@ -831,6 +831,52 @@
     background: #fee2e2;
     border-color: rgba(239, 68, 68, 0.2);
     color: #dc2626;
+}
+
+.admin-sidebar-logout-btn {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.4rem;
+    width: auto !important;
+    height: auto !important;
+    padding: 0.38rem 0.8rem !important;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: 'Segoe UI', sans-serif;
+    letter-spacing: 0.01em;
+    border-radius: 8px !important;
+    border: 1.5px solid rgba(220, 38, 38, 0.3) !important;
+    color: #dc2626 !important;
+    background: rgba(254, 242, 242, 0.85) !important;
+    cursor: pointer;
+    transition: background 0.18s ease, border-color 0.18s ease,
+                color 0.18s ease, box-shadow 0.18s ease, transform 0.13s ease;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+.admin-sidebar-logout-btn svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.admin-sidebar-logout-btn span {
+    line-height: 1;
+}
+.admin-sidebar-logout-btn:hover {
+    background: #fee2e2 !important;
+    border-color: rgba(220, 38, 38, 0.55) !important;
+    color: #b91c1c !important;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.18);
+    transform: translateY(-1px);
+}
+.admin-sidebar-logout-btn:active {
+    transform: translateY(0);
+    box-shadow: none !important;
 }
 
 .admin-main {

@@ -57,18 +57,6 @@
             </div>
         </div>
 
-        {{-- Live preview --}}
-        <div class="sms-preview-card">
-            <div class="sms-preview-heading">
-                <i class="bi bi-eye"></i> Live preview
-            </div>
-            <div class="sms-preview-toggles">
-                <button type="button" class="sms-preview-toggle active" data-status="IN">Scan IN</button>
-                <button type="button" class="sms-preview-toggle" data-status="OUT">Scan OUT</button>
-            </div>
-            <div class="sms-preview-bubble" id="previewBubble"></div>
-        </div>
-
         {{-- Actions --}}
         <div class="sms-actions">
             <button type="submit" class="sms-btn">
@@ -86,11 +74,7 @@
 <script>
 const textarea    = document.getElementById('scanMsgTextarea');
 const counter     = document.getElementById('charCounter');
-const preview     = document.getElementById('previewBubble');
-const toggles     = document.querySelectorAll('.sms-preview-toggle');
 const defaultMsg  = {{ Js::from($message) }};
-
-let previewStatus = 'IN';
 
 function updateCounter() {
     const len = textarea.value.length;
@@ -99,25 +83,7 @@ function updateCounter() {
         (len >= 160 ? ' at-limit' : len >= 130 ? ' near-limit' : '');
 }
 
-function updatePreview() {
-    const now = new Date();
-    const time = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-    preview.textContent = textarea.value
-        .replace(/\{name\}/g,   'Maria Santos')
-        .replace(/\{status\}/g, previewStatus)
-        .replace(/\{time\}/g,   time);
-}
-
-textarea.addEventListener('input', () => { updateCounter(); updatePreview(); });
-
-toggles.forEach(btn => {
-    btn.addEventListener('click', () => {
-        toggles.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        previewStatus = btn.dataset.status;
-        updatePreview();
-    });
-});
+textarea.addEventListener('input', updateCounter);
 
 document.querySelectorAll('.sms-var-chip').forEach(chip => {
     chip.addEventListener('click', () => {
@@ -138,6 +104,5 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 
 // Init
 updateCounter();
-updatePreview();
 </script>
 @endsection
