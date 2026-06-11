@@ -84,7 +84,7 @@
                     </p>
                 </div>
             </div>
-            @endauth
+      
         </div>
     </section>
 @endsection

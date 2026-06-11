@@ -30,6 +30,8 @@
                     <option value="3">3rd Year</option>
                     <option value="4">4th Year</option>
                 </select>
+
+                
             </div>
 
             <div class="col-md-6">
@@ -65,13 +67,13 @@
                 name="message" 
                 class="form-control" 
                 rows="5"
-                placeholder="Example: Hello {name}, please visit the library today."
+                placeholder="Example: Hello (name), please visit the library today."
                 required
             ></textarea>
 
             <small class="text-muted">
                 Available variables:
-                <br><b>{name}</b> = Student full name
+                <br><b>(name)</b> = Student full name
             </small>
 
         </div>
