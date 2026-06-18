@@ -11,7 +11,7 @@ body.scan-kiosk-page {
 
     .header {
       background: #ffffff;
-      padding: 10px clamp(14px, 2vw, 28px);
+      padding: 15px clamp(14px, 2vw, 28px);
       display: flex;
       align-items: center;
       border-bottom: 3px solid var(--brand-primary, #29abe2);
@@ -28,11 +28,13 @@ body.scan-kiosk-page {
     }
 
     .header img {
-      height: clamp(40px, 5vw, 64px);
-      width: auto;
-      max-width: min(220px, 34vw);
+      width: clamp(240px, 28vw, 360px);
+      height: auto;
+      max-width: min(360px, 70vw);
       margin-left: 0;
       object-fit: contain;
+      grid-column: 2;
+      justify-self: center;
     }
 
     .header .system-title {
@@ -89,9 +91,21 @@ body.scan-kiosk-page {
       color: #ffffff;
     }
 
+    .marquee-powered {
+      display: inline-block;
+      margin-left: clamp(600px, 100vw, 900px);
+      opacity: 0;
+      animation: scan-powered-show 15s linear infinite;
+    }
+
     @keyframes scan-marquee-scroll {
       0% { transform: translateX(0%); }
       100% { transform: translateX(-100%); }
+    }
+
+    @keyframes scan-powered-show {
+      0%, 35% { opacity: 0; }
+      45%, 100% { opacity: 1; }
     }
 
     .footer1 .footer-title{
@@ -184,6 +198,14 @@ body.scan-kiosk-page {
     .sidebar .name-box .label,
     .sidebar .name-box .timestamp {
       color: #64748b;
+    }
+
+    .name-box--example {
+      opacity: 0.8;
+    }
+
+    .name-box--example .status-button {
+      background: #64748b;
     }
     .date {
       font-size: 16px;
@@ -512,14 +534,14 @@ body.scan-kiosk-page {
     }
 @media(max-width: 1280px){
     .header img {
-        height: 3rem;
-        width: auto;
+        width: clamp(220px, 30vw, 320px);
+        height: auto;
     }
 }
 @media(max-width: 1024px){
     .header img{
-        height: 2rem;
-        width: auto;
+        width: clamp(180px, 30vw, 260px);
+        height: auto;
     }
     .header .system-title{
         font-size: 25px;
@@ -538,8 +560,8 @@ body.scan-kiosk-page {
         grid-template-columns: auto 1fr;
     }
     .header img{
-        height: 1.5rem;
-        width: auto;
+        width: clamp(150px, 42vw, 220px);
+        height: auto;
     }
     .header{
         text-align: center;
@@ -578,8 +600,8 @@ body.scan-kiosk-page {
         text-align: center;
     }
     .header img{
-        height: 1rem;
-        width: auto;
+        width: clamp(120px, 46vw, 170px);
+        height: auto;
     }
     .header .system-title{
         font-size: 12px;
@@ -608,6 +630,7 @@ body.scan-kiosk-page {
         width: auto;
     }
 }
+
 
 /* Early checkout block (kinder & grade school before 4 PM) */
 .sidebar--alarm {
@@ -671,4 +694,207 @@ body.scan-kiosk-page {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-6px); }
   75% { transform: translateX(6px); }
+}
+
+/* ===== SIDEBAR DIVIDER / SCAN NAME DISPLAY ===== */
+.sidebar-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-primary-darker, #125a82);
+  overflow: hidden;
+}
+
+.scan-name-display {
+  width: 100%;
+  text-align: center;
+  padding: 14px 24px;
+  animation: fadeInUp 0.3s ease;
+}
+
+.scan-name-display--example {
+  opacity: 0.75;
+}
+
+.scan-name-welcome {
+  font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-family: 'Poppins', sans-serif;
+  margin-bottom: 2px;
+}
+
+.scan-name-text {
+  font-size: clamp(1.3rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.scan-status-badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 20px;
+  border-radius: 20px;
+  background: var(--brand-primary, #29abe2);
+  color: #ffffff;
+  font-size: clamp(0.8rem, 1.4vw, 1rem);
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: 'Poppins', sans-serif;
+}
+
+.scan-status-badge.scan-status-out {
+  background: #dc2626;
+}
+
+.scan-name-timestamp {
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'Poppins', sans-serif;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Landscape: thin vertical separator, name hidden */
+@media (orientation: landscape) {
+  .sidebar-divider {
+    width: 6px;
+  }
+  .scan-name-display {
+    display: none;
+  }
+}
+
+/* Portrait: full-width horizontal banner */
+@media (orientation: portrait) {
+  .sidebar-divider {
+    width: 100%;
+    min-height: 0;
+  }
+  .sidebar > .scan-result-box {
+    display: none;
+  }
+  .scan-name-display[hidden] {
+    display: none;
+  }
+  .scan-name-display:not([hidden]) {
+    display: block;
+  }
+}
+
+/* ===== PORTRAIT KIOSK ===== */
+@media (orientation: portrait) and (min-width: 769px) {
+  body.scan-kiosk-page {
+    overflow: hidden;
+  }
+  .main {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 24px;
+    gap: 6px;
+    min-height: auto;
+  }
+  .date {
+    text-align: center;
+  }
+  .time {
+    font-size: clamp(28px, 5vw, 48px);
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .profile-pic {
+    width: clamp(100px, 14vw, 160px);
+    height: clamp(100px, 14vw, 160px);
+    margin-bottom: 0;
+  }
+  .name-box {
+    min-height: auto;
+    margin-top: 8px;
+    width: 100%;
+    padding: 12px 16px;
+  }
+  .student-name {
+    font-size: clamp(1rem, 3vw, 1.6rem);
+  }
+  .status-button {
+    font-size: clamp(0.9rem, 2.5vw, 1.3rem);
+  }
+  .right-content {
+    flex: 1;
+    padding: 12px 16px;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+  }
+  .sidebar-divider {
+    min-height: clamp(120px, 9vh, 180px);
+  }
+  .scan-name-display {
+    padding: 20px 28px;
+  }
+  .right-content {
+    padding: 12px 16px;
+    border-radius: 14px;
+  }
+  .right-content video,
+  .right-content iframe {
+    display: block;
+    width: 100%;
+    height: 35vh;
+    max-width: 100%;
+    max-height: none;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 14px;
+    border: 3px solid var(--brand-primary, #29abe2);
+    box-shadow: 0 8px 32px rgba(41, 171, 226, 0.2);
+  }
+  .ads-vid {
+    display: block;
+    width: 100%;
+    height: 35vh;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 14px;
+  }
+  .header {
+    padding: 6px clamp(10px, 2vw, 20px);
+  }
+  .header img {
+    width: clamp(180px, 32vw, 260px);
+    height: auto;
+  }
+  .header .system-title {
+    font-size: 13px;
+  }
+  .home-button {
+    min-height: 32px;
+    padding: 5px 12px;
+    font-size: 0.75rem;
+  }
+  .scan-name-text {
+    font-size: clamp(1.6rem, 5vw, 3rem);
+  }
+  .scan-name-welcome {
+    font-size: 1rem;
+    letter-spacing: 3px;
+  }
+  .scan-status-badge {
+    font-size: 1.1rem;
+    padding: 6px 28px;
+  }
 }

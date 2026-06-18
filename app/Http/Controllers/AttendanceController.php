@@ -204,7 +204,7 @@ class AttendanceController extends Controller
 
         $video = $request->file('video');
         $filename = 'area51_product_slideshow.mp4';
-        $video->move(base_path('videos'), $filename);
+        $video->move(public_path('videos'), $filename);
 
         return redirect()->route('attendance.changeVideo')->with('success', 'Video uploaded successfully!');
     }

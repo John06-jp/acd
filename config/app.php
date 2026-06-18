@@ -14,6 +14,7 @@ return [
     */
 
     'name' => env('APP_NAME', 'Assumption College of Davao'),
+    'name_short' => env('APP_DESCRIPTION', 'Pantas'),
 
     /*
     |--------------------------------------------------------------------------
