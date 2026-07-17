@@ -24,7 +24,11 @@
     .revision-panel { margin-top:1rem; padding:1rem; }
     .revision-row { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.75rem 0; border-top:1px solid #edf2f7; }
     .preview-frame { border:1px solid #cbd5e1; border-radius:12px; padding:1rem; background:#f8fafc; margin-top:1rem; overflow:hidden; }
-    .preview-card { max-width:680px; margin:auto; padding:1.25rem; border-radius:12px; background:var(--preview-card,#fff); transition:.2s; }
+    .preview-stage { width:100%; max-width:900px; margin:auto; transition:max-width .2s ease; }
+    .preview-stage iframe { display:block; width:100%; height:500px; border:1px solid #cbd5e1; border-radius:10px; background:#fff; }
+    .preview-toolbar { display:flex; gap:.4rem; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-bottom:.75rem; }
+    .preview-scenes { display:flex; gap:.35rem; flex-wrap:wrap; }
+    .preview-scenes button.active { background:#125a82; color:#fff; border-color:#125a82; }
     @media (max-width:767px) { .settings-grid { grid-template-columns:1fr; } .customization-header { align-items:flex-start; } }
 </style>
 @endpush
@@ -98,7 +102,7 @@
                             <img src="{{ app(\App\Services\SiteSettingsService::class)->publicUrl($key) }}" alt="Current {{ strtolower($definition['label']) }}" data-image-preview>
                             <form method="POST" enctype="multipart/form-data" action="{{ route('site-customization.images.upload', $key) }}">
                                 @csrf
-                                <input class="form-control form-control-sm mb-2" type="file" name="image" accept="image/png,image/jpeg,image/webp" data-image-input required>
+                                <input class="form-control form-control-sm mb-2" type="file" name="image" accept="image/png,image/jpeg,image/webp" data-image-input data-image-key="{{ $key }}" required>
                                 <button class="btn btn-sm btn-primary" type="submit">Upload / Replace</button>
                             </form>
                             @if(str_starts_with($values[$key], config('site-customization.image_directory').'/'))
@@ -119,8 +123,19 @@
     </div>
 
     <div class="preview-frame" aria-live="polite">
-        <div class="d-flex justify-content-between align-items-center mb-2"><strong>Live Preview</strong><div><button type="button" class="btn btn-sm btn-outline-secondary" data-preview-width="680px">Desktop</button> <button type="button" class="btn btn-sm btn-outline-secondary" data-preview-width="360px">Mobile</button></div></div>
-        <div class="preview-card" data-preview-card><h3 data-preview-title>{{ $values['landing.hero_heading'] }}</h3><p data-preview-description>{{ $values['landing.hero_description'] }}</p><button type="button" class="btn btn-primary" data-preview-button>{{ $values['landing.primary_button_label'] }}</button></div>
+        <div class="preview-toolbar">
+            <div><strong>Exact Live Preview</strong><div class="small text-muted">Unsaved values render only inside this isolated preview.</div></div>
+            <div><button type="button" class="btn btn-sm btn-outline-secondary active" data-preview-width="900px">Desktop</button> <button type="button" class="btn btn-sm btn-outline-secondary" data-preview-width="390px">Mobile</button></div>
+        </div>
+        <div class="preview-scenes mb-2" role="tablist" aria-label="Preview page">
+            <button type="button" class="btn btn-sm btn-outline-secondary active" data-preview-scene="landing">Landing</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-preview-scene="login">Login</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-preview-scene="sidebar">Sidebar</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-preview-scene="theme">Buttons &amp; Tables</button>
+        </div>
+        <div class="preview-stage" data-preview-stage>
+            <iframe title="Unsaved site customization preview" sandbox data-preview-frame></iframe>
+        </div>
     </div>
 
     <section class="revision-panel">
@@ -140,15 +155,59 @@
 (() => {
     const editor = document.querySelector('[data-customization-editor]'); if (!editor) return;
     let dirty = false;
+    let previewScene = 'landing';
+    const initialValues = @json($values);
+    const imageUrls = {
+        'branding.landing_logo': @json(app(\App\Services\SiteSettingsService::class)->publicUrl('branding.landing_logo')),
+        'branding.login_logo': @json(app(\App\Services\SiteSettingsService::class)->publicUrl('branding.login_logo')),
+        'branding.sidebar_logo': @json(app(\App\Services\SiteSettingsService::class)->publicUrl('branding.sidebar_logo')),
+        'branding.sidebar_compact_logo': @json(app(\App\Services\SiteSettingsService::class)->publicUrl('branding.sidebar_compact_logo')),
+        'landing.hero_image': @json(app(\App\Services\SiteSettingsService::class)->publicUrl('landing.hero_image')),
+    };
+    const frame = editor.querySelector('[data-preview-frame]');
+    const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[character]));
+    const safeColor = (value, fallback) => /^#[0-9a-f]{6}$/i.test(value ?? '') ? value : fallback;
+    const settingValues = () => {
+        const values = {...initialValues};
+        editor.querySelectorAll('[data-setting]').forEach(input => {
+            values[input.dataset.setting] = input.type === 'checkbox' ? input.checked : input.value;
+        });
+        return values;
+    };
+    const previewDocument = (values, scene) => {
+        const primary = safeColor(values['buttons.primary_background'], '#29abe2');
+        const primaryText = safeColor(values['buttons.primary_text'], '#ffffff');
+        const secondary = safeColor(values['buttons.secondary_background'], '#6c757d');
+        const secondaryText = safeColor(values['buttons.secondary_text'], '#ffffff');
+        const radius = Math.max(0, Math.min(32, Number(values['buttons.radius']) || 8));
+        const font = escapeHtml(values['advanced_theme.font_family'] || 'Inter');
+        const base = `<style>*{box-sizing:border-box}body{margin:0;font-family:${font},Arial,sans-serif;background:${safeColor(values['advanced_theme.page_background'],'#f4f9fc')};color:#1f2937}img{max-width:100%}.btn{display:inline-block;padding:10px 16px;border-radius:${radius}px;text-decoration:none;font-weight:700;border:1px solid transparent}.primary{background:${primary};color:${primaryText};border-color:${safeColor(values['buttons.primary_border'],primary)}}.secondary{background:${secondary};color:${secondaryText};border-color:${safeColor(values['buttons.secondary_border'],secondary)}}</style>`;
+        if (scene === 'login') {
+            return `<!doctype html><html><head>${base}<style>body{min-height:498px;display:grid;place-items:center;padding:18px;background:${safeColor(values['login.page_background'],'#f8f9fa')}}.card{width:min(420px,100%);padding:32px;border-radius:${Number(values['login.card_radius'])||20}px;background:${safeColor(values['login.card_background'],'#fff')};box-shadow:0 12px 32px #0002;text-align:center;color:${safeColor(values['login.text_color'],'#212529')}}.logo{max-width:170px;max-height:90px;object-fit:contain}.muted{color:${safeColor(values['login.muted_text_color'],'#6c757d')}}label{display:block;text-align:left;font-weight:600;margin:12px 0 5px}input{width:100%;padding:12px;border:1px solid #ced4da;border-radius:12px}.login-btn{width:100%;margin-top:18px;background:${safeColor(values['login.button_background'],'#0d6efd')};color:${safeColor(values['login.button_text_color'],'#fff')}} </style></head><body><main class="card"><img class="logo" src="${escapeHtml(imageUrls['branding.login_logo'])}" alt=""><h1>${escapeHtml(values['login.title'])}</h1><p class="muted">${escapeHtml(values['login.subtitle'])}</p><label>${escapeHtml(values['login.email_label'])}</label><input type="text"><label>${escapeHtml(values['login.password_label'])}</label><input type="password"><button class="btn login-btn">${escapeHtml(values['login.button_text'])}</button>${values['login.footer_message']?`<p class="muted">${escapeHtml(values['login.footer_message'])}</p>`:''}</main></body></html>`;
+        }
+        if (scene === 'sidebar') {
+            return `<!doctype html><html><head>${base}<style>body{background:#eef2f7}.shell{display:flex;min-height:498px}.side{width:${Math.max(220,Math.min(360,Number(values['sidebar.expanded_width'])||260))}px;padding:14px 10px;background:${safeColor(values['sidebar.background'],'#0373e3')};color:${safeColor(values['sidebar.text'],'#fff')}}.brand{background:#fff;border-radius:10px;padding:10px;text-align:center}.brand img{max-height:58px}.role{font-size:11px;color:#125a82;font-weight:700}.link{display:block;padding:10px;margin-top:6px;border-radius:8px;color:inherit}.link.active{background:${safeColor(values['sidebar.active_background'],'#ffc233')};color:${safeColor(values['sidebar.active_text'],'#fff')}}.link.hover{background:${safeColor(values['sidebar.hover_background'],'#0373e3')};color:${safeColor(values['sidebar.hover_text'],'#fff')}}.content{padding:30px;flex:1}</style></head><body><div class="shell"><aside class="side"><div class="brand"><img src="${escapeHtml(imageUrls['branding.sidebar_logo'])}" alt=""><div class="role">ADMINDEVELOPER ${escapeHtml(values['sidebar.dashboard_label'])}</div></div><div class="link active">${escapeHtml(values['sidebar.home_label'])}</div>${values['sidebar.show_attendance']?`<div class="link">${escapeHtml(values['sidebar.attendance_label'])}</div>`:''}${values['sidebar.show_data']?`<div class="link hover">${escapeHtml(values['sidebar.data_label'])}</div>`:''}${values['sidebar.show_communication']?`<div class="link">${escapeHtml(values['sidebar.communication_label'])}</div>`:''}<div class="link">Site Customization</div></aside><main class="content"><h2>Sidebar Preview</h2><p>Expanded width, colors, labels, hover, active state, and visibility update here.</p></main></div></body></html>`;
+        }
+        if (scene === 'theme') {
+            const variants = ['primary','secondary','success','warning','danger','neutral'];
+            const buttons = variants.map(variant => `<button class="sample" style="background:${safeColor(values[`buttons.${variant}_background`],'#777')};color:${safeColor(values[`buttons.${variant}_text`],'#fff')};border-color:${safeColor(values[`buttons.${variant}_border`],'#777')}">${variant[0].toUpperCase()+variant.slice(1)}</button>`).join('');
+            const padding = values['tables.spacing']==='compact' ? values['tables.compact_padding'] : values['tables.comfortable_padding'];
+            return `<!doctype html><html><head>${base}<style>body{padding:24px}.samples{display:flex;gap:8px;flex-wrap:wrap}.sample{padding:10px 14px;border:1px solid;border-radius:${radius}px;font-weight:700}table{width:100%;margin-top:24px;border-collapse:separate;border-spacing:0;border-radius:${Number(values['tables.radius'])||8}px;overflow:hidden;background:${safeColor(values['tables.body_background'],'#fff')};color:${safeColor(values['tables.body_text'],'#212529')}}th,td{padding:${Number(padding)||12}px;border:1px solid ${safeColor(values['tables.border'],'#dee2e6')}}th{background:${safeColor(values['tables.header_background'],'#29abe2')};color:${safeColor(values['tables.header_text'],'#fff')}.stripe{background:${safeColor(values['tables.stripe_background'],'#f8f9fa')}.hover{background:${safeColor(values['tables.hover_background'],'#e3f4fc')}.selected{background:${safeColor(values['tables.selected_background'],'#cfefff')}}</style></head><body><h2>Button Variants</h2><div class="samples">${buttons}</div><table><thead><tr><th>Name</th><th>Status</th></tr></thead><tbody><tr><td>Normal row</td><td>Active</td></tr><tr class="stripe"><td>Striped row</td><td>Pending</td></tr><tr class="hover"><td>Hover row</td><td>Review</td></tr><tr class="selected"><td>Selected row</td><td>Selected</td></tr></tbody></table></body></html>`;
+        }
+        return `<!doctype html><html><head>${base}<style>.header{padding:10px 18px;background:#fff}.logo{max-height:55px}.hero{min-height:220px;padding:30px;display:grid;place-items:center;text-align:center;background:linear-gradient(#0003,#0003),url("${escapeHtml(imageUrls['landing.hero_image'])}") center/cover;color:#fff}.faq{margin:20px;padding:20px;background:#fff;border-radius:12px}.footer{padding:14px;text-align:center;background:#125a82;color:#fff}</style></head><body><header class="header"><img class="logo" src="${escapeHtml(imageUrls['branding.landing_logo'])}" alt=""></header><section class="hero">${values['landing.show_hero_content']?`<div><h1>${escapeHtml(values['landing.hero_heading'])}</h1><p>${escapeHtml(values['landing.hero_description'])}</p><a class="btn primary">${escapeHtml(values['landing.primary_button_label'])}</a> <a class="btn secondary">${escapeHtml(values['landing.secondary_button_label'])}</a></div>`:''}</section>${values['landing.show_faq']?`<section class="faq"><h2>${escapeHtml(values['landing.section_heading'])}</h2><h3>${escapeHtml(values['landing.section_subheading'])}</h3><p>${escapeHtml(values['landing.section_description'])}</p></section>`:''}${values['landing.show_footer']?`<footer class="footer">${escapeHtml(values['landing.footer_text'])}</footer>`:''}</body></html>`;
+    };
+    const renderPreview = () => { frame.srcdoc = previewDocument(settingValues(), previewScene); };
     const tabs = editor.querySelectorAll('[data-tab]');
-    tabs.forEach(tab => tab.addEventListener('click', () => { tabs.forEach(t => { t.classList.toggle('active', t === tab); t.setAttribute('aria-selected', t === tab ? 'true' : 'false'); }); editor.querySelectorAll('[data-section]').forEach(s => s.classList.toggle('active', s.dataset.section === tab.dataset.tab)); }));
+    tabs.forEach(tab => tab.addEventListener('click', () => { tabs.forEach(t => { t.classList.toggle('active', t === tab); t.setAttribute('aria-selected', t === tab ? 'true' : 'false'); }); editor.querySelectorAll('[data-section]').forEach(s => s.classList.toggle('active', s.dataset.section === tab.dataset.tab)); const sceneMap={branding:'landing',landing:'landing',login:'login',sidebar:'sidebar',buttons:'theme',tables:'theme',advanced_theme:'theme'}; previewScene=sceneMap[tab.dataset.tab]; editor.querySelectorAll('[data-preview-scene]').forEach(button=>button.classList.toggle('active',button.dataset.previewScene===previewScene)); renderPreview(); }));
     editor.querySelectorAll('[data-color-picker]').forEach(picker => { const text = picker.parentElement.querySelector('[data-color-text]'); picker.addEventListener('input', () => { text.value = picker.value; text.dispatchEvent(new Event('input', {bubbles:true})); }); text.addEventListener('input', () => { if (/^#[0-9a-f]{6}$/i.test(text.value)) picker.value = text.value; }); });
-    editor.querySelectorAll('[data-settings-form] input, [data-settings-form] textarea, [data-settings-form] select').forEach(input => input.addEventListener('input', () => { dirty = true; const key=input.dataset.setting; if(key==='landing.hero_heading') editor.querySelector('[data-preview-title]').textContent=input.value; if(key==='landing.hero_description') editor.querySelector('[data-preview-description]').textContent=input.value; if(key==='landing.primary_button_label') editor.querySelector('[data-preview-button]').textContent=input.value; if(key==='buttons.primary_background') editor.querySelector('[data-preview-button]').style.backgroundColor=input.value; }));
+    editor.querySelectorAll('[data-settings-form] input, [data-settings-form] textarea, [data-settings-form] select').forEach(input => input.addEventListener('input', () => { dirty = true; renderPreview(); }));
     editor.querySelectorAll('form').forEach(form => form.addEventListener('submit', e => { if (form.dataset.confirm && !confirm(form.dataset.confirm)) { e.preventDefault(); return; } dirty=false; }));
-    editor.querySelectorAll('[data-image-input]').forEach(input => input.addEventListener('change', () => { const file=input.files[0]; if(file) input.closest('.image-setting').querySelector('[data-image-preview]').src=URL.createObjectURL(file); dirty=true; }));
-    editor.querySelectorAll('[data-preview-width]').forEach(button => button.addEventListener('click', () => editor.querySelector('[data-preview-card]').style.maxWidth=button.dataset.previewWidth));
+    editor.querySelectorAll('[data-image-input]').forEach(input => input.addEventListener('change', () => { const file=input.files[0]; if(file) { const url=URL.createObjectURL(file); input.closest('.image-setting').querySelector('[data-image-preview]').src=url; imageUrls[input.dataset.imageKey]=url; renderPreview(); } dirty=true; }));
+    editor.querySelectorAll('[data-preview-width]').forEach(button => button.addEventListener('click', () => { editor.querySelector('[data-preview-stage]').style.maxWidth=button.dataset.previewWidth; editor.querySelectorAll('[data-preview-width]').forEach(item=>item.classList.toggle('active',item===button)); }));
+    editor.querySelectorAll('[data-preview-scene]').forEach(button => button.addEventListener('click', () => { previewScene=button.dataset.previewScene; editor.querySelectorAll('[data-preview-scene]').forEach(item=>item.classList.toggle('active',item===button)); renderPreview(); }));
     editor.querySelector('[data-save-all]').addEventListener('click', () => { const form=editor.querySelector('[data-all-form]'); form.querySelectorAll('[data-generated]').forEach(n=>n.remove()); editor.querySelectorAll('[data-settings-form]').forEach(sectionForm => new FormData(sectionForm).forEach((value,key) => { if(key==='_token'||key==='_method') return; const input=document.createElement('input'); input.type='hidden'; input.name=key; input.value=value; input.dataset.generated='1'; form.appendChild(input); })); dirty=false; form.submit(); });
     window.addEventListener('beforeunload', event => { if(dirty) { event.preventDefault(); event.returnValue=''; } });
+    renderPreview();
 })();
 </script>
 @endpush
