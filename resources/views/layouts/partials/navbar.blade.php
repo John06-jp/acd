@@ -5,7 +5,7 @@
 
 <div class="pantas-header d-flex align-items-center px-4 py-2 flex-wrap">
     <a href="{{ route('home') }}">
-        <img src="{{ asset('images/pantasLogo.png') }}" alt="{{ config('app.name') }}" class="header-logo-img">
+        <img src="{{ app(\App\Services\SiteSettingsService::class)->publicUrl('branding.landing_logo') }}" alt="{{ app(\App\Services\SiteSettingsService::class)->get('branding.site_name') }}" class="header-logo-img">
     </a>
 
     <button id="customMenuToggle" class="d-md-none toggle-btn" type="button" aria-label="Open menu">&#9776;</button>

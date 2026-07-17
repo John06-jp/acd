@@ -1,5 +1,10 @@
 @extends('layouts.main')
 
+@php
+    $siteSettings = app(\App\Services\SiteSettingsService::class);
+    $landing = $siteSettings->group('landing');
+@endphp
+
 @push('page-styles')
 <style>
     .faq-header h2,
@@ -87,14 +92,26 @@
 @endpush
 
 @section('content')
+    @if($landing['landing.show_hero_content'])
+    <section class="text-center py-4" aria-labelledby="landing-heading">
+        <h1 id="landing-heading" class="fw-bold">{{ $landing['landing.hero_heading'] }}</h1>
+        @if($landing['landing.hero_description'])<p class="text-muted mx-auto" style="max-width:720px">{{ $landing['landing.hero_description'] }}</p>@endif
+        <div class="d-flex gap-2 justify-content-center flex-wrap">
+            <a class="site-btn site-btn-primary" href="{{ $landing['landing.primary_button_url'] }}">{{ $landing['landing.primary_button_label'] }}</a>
+            <a class="site-btn site-btn-secondary" href="{{ $landing['landing.secondary_button_url'] }}">{{ $landing['landing.secondary_button_label'] }}</a>
+        </div>
+    </section>
+    @endif
+    @if($landing['landing.show_faq'])
     <section class="faq-section">
         <div class="faq-container">
 
             <div class="faq-header">
-                <h2>Frequently Asked Questions</h2>
+                <h2>{{ $landing['landing.section_heading'] }}</h2>
             </div>
 
-            <h3 class="faq-subtitle">Getting Started</h3>
+            <h3 class="faq-subtitle">{{ $landing['landing.section_subheading'] }}</h3>
+            @if($landing['landing.section_description'])<p class="text-muted">{{ $landing['landing.section_description'] }}</p>@endif
  @auth
             <div class="faq-list faq-accordion" id="homeFaqAccordion">
                 <div class="faq-item">
@@ -180,7 +197,12 @@
             </div>
         </div>
     </section>
+    @endif
     @endauth
 @endsection
 
-
+@if($landing['landing.show_footer'] && $landing['landing.footer_text'])
+@section('footer')
+<footer class="text-center py-3" style="background:var(--brand-footer-bg,#125a82);color:#fff">{{ $landing['landing.footer_text'] }}</footer>
+@endsection
+@endif

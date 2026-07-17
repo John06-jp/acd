@@ -1,20 +1,22 @@
 <?php
 
 use App\Http\Controllers\AttendanceController;
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AttendanceLogController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DeveloperDashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\EmployeeIdCardController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IdCardController;
 use App\Http\Controllers\PendingEmployeeController;
 use App\Http\Controllers\PendingStudentController;
-use App\Http\Controllers\SmsController;
-use App\Http\Controllers\StudentController;
 use App\Http\Controllers\ProspectusController;
 use App\Http\Controllers\Sf2ReportController;
+use App\Http\Controllers\SiteCustomizationController;
+use App\Http\Controllers\SmsController;
+use App\Http\Controllers\StudentController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -107,7 +109,23 @@ Route::middleware(['auth', 'can:isAdminOrStaff'])->group(function () {
     Route::get('/students/export', [StudentController::class, 'export'])->name('students.export');
 });
 
-// Admin only
+// Developer administrator only
+Route::middleware(['auth', 'can:isAdminDeveloper'])->prefix('developer')->group(function () {
+    Route::get('/dashboard', DeveloperDashboardController::class)->name('developer.dashboard');
+
+    Route::prefix('site-customization')->name('site-customization.')->group(function () {
+        Route::get('/', [SiteCustomizationController::class, 'index'])->name('index');
+        Route::put('/', [SiteCustomizationController::class, 'updateAll'])->name('update-all');
+        Route::put('/section/{group}', [SiteCustomizationController::class, 'updateSection'])->name('update-section');
+        Route::post('/images/{key}', [SiteCustomizationController::class, 'upload'])->name('images.upload');
+        Route::delete('/images/{key}', [SiteCustomizationController::class, 'removeImage'])->name('images.remove');
+        Route::delete('/section/{group}', [SiteCustomizationController::class, 'resetSection'])->name('reset-section');
+        Route::delete('/', [SiteCustomizationController::class, 'resetAll'])->name('reset-all');
+        Route::post('/revisions/{batch}/restore', [SiteCustomizationController::class, 'restore'])->name('restore');
+    });
+});
+
+// Library admin only
 Route::middleware(['auth', 'can:isAdmin'])->group(function () {
     Route::get('/register-student', [StudentController::class, 'create'])->name('students.create');
     Route::post('/register-student', [StudentController::class, 'store'])->name('students.store');

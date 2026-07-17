@@ -345,8 +345,8 @@
             @endif
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+        <div class="table-responsive site-table-wrap">
+            <table class="table table-hover align-middle mb-0 site-table">
                 <thead>
                     <tr>
                         <th style="width:3rem">#</th>

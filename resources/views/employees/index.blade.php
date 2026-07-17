@@ -62,8 +62,8 @@
                 'downloadIdsRoute' => route('employees.bulk.ids', request()->query()),
             ])
 
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover text-center align-middle patron-list-table">
+            <div class="table-responsive site-table-wrap">
+                <table class="table table-bordered table-hover text-center align-middle patron-list-table site-table">
                     <thead>
                         <tr>
                             <th scope="col">Profile</th>

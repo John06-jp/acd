@@ -52,6 +52,7 @@ class AuthController extends Controller
     {
         return match ($role) {
             'admin', 'staff' => redirect()->route('home'),
+            'admindeveloper' => redirect()->route('developer.dashboard'),
             'student', 'faculty' => redirect()->route('attendance.scan'),
             default => redirect()->route('login')->with('error', 'Unauthorized role.'),
         };

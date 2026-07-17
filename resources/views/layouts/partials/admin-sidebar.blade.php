@@ -1,16 +1,20 @@
 @php
     $isActive = fn (array $patterns) => collect($patterns)->contains(fn ($pattern) => request()->routeIs($pattern));
     $user = Auth::user();
+    $siteSettings = app(\App\Services\SiteSettingsService::class);
+    $sidebarSettings = $siteSettings->group('sidebar');
+    $isDeveloperAdmin = $user->can('isAdminDeveloper');
 
     $navLinks = [
         [
-            'label'    => 'Home',
+            'label'    => $sidebarSettings['sidebar.home_label'],
             'route'    => 'home',
             'patterns' => ['home'],
             'icon'     => 'home',
         ],
         [
-            'label'    => 'Attendance',
+            'label'    => $sidebarSettings['sidebar.attendance_label'],
+            'visible'  => $sidebarSettings['sidebar.show_attendance'],
             'icon'     => 'calendar-check',
             'patterns' => ['sf2.*', 'attendance.*', 'attendance_logs.*'],
             'children' => [
@@ -24,7 +28,8 @@
             ],
         ],
         [
-            'label'    => 'Data',
+            'label'    => $sidebarSettings['sidebar.data_label'],
+            'visible'  => $sidebarSettings['sidebar.show_data'],
             'icon'     => 'users',
             'patterns' => ['students.*', 'pending.index', 'students.pending', 'employees.*', 'pending.employees'],
             'children' => [
@@ -33,7 +38,8 @@
             ],
         ],
         [
-            'label'    => 'Communication',
+            'label'    => $sidebarSettings['sidebar.communication_label'],
+            'visible'  => $sidebarSettings['sidebar.show_communication'],
             'icon'     => 'message',
             'patterns' => ['feedback.index', 'sms.*'],
             'children' => [
@@ -45,6 +51,7 @@
     ];
 
     $adminChildren = [
+        ['label' => 'Site Customization', 'route' => 'site-customization.index', 'patterns' => ['site-customization.*'], 'icon' => 'settings'],
         ['label' => 'Prospectus', 'route' => 'prospectus.index', 'patterns' => ['prospectus.*'], 'icon' => 'grid'],
         ['label' => 'Files',      'route' => 'files.index',      'patterns' => ['files.*'],      'icon' => 'folder'],
         [
@@ -57,6 +64,25 @@
             ],
         ],
     ];
+
+    if ($isDeveloperAdmin) {
+        $navLinks = [
+            [
+                'label' => 'Developer Dashboard',
+                'route' => 'developer.dashboard',
+                'patterns' => ['developer.dashboard'],
+                'icon' => 'home',
+            ],
+        ];
+        $adminChildren = [
+            ['label' => 'Site Customization', 'route' => 'site-customization.index', 'patterns' => ['site-customization.*'], 'icon' => 'settings'],
+        ];
+    } else {
+        $adminChildren = array_values(array_filter(
+            $adminChildren,
+            fn (array $item) => ($item['route'] ?? null) !== 'site-customization.index'
+        ));
+    }
 
     $icon = function (string $name) {
         return match ($name) {
@@ -138,16 +164,16 @@
 <div class="admin-sidebar-overlay" data-admin-sidebar-overlay></div>
 
 <aside class="admin-sidebar" aria-label="Admin sidebar">
-    <a href="{{ route('home') }}" class="admin-sidebar-brand">
-        <img src="{{ asset('images/pantasLogo.png') }}"
+    <a href="{{ $isDeveloperAdmin ? route('developer.dashboard') : route('home') }}" class="admin-sidebar-brand">
+        <img src="{{ $siteSettings->publicUrl('branding.sidebar_logo') }}"
              alt="Assumption College of Davao"
              class="admin-sidebar-brand-img"
              width="3905" height="1056">
         <span class="admin-sidebar-brand-seal" aria-hidden="true">
-            <img src="{{ asset('images/pantasLogo.png') }}" alt="" width="3905" height="1056">
+            <img src="{{ $siteSettings->publicUrl('branding.sidebar_compact_logo') }}" alt="" width="3905" height="1056">
         </span>
         <span class="admin-sidebar-brand-role">
-            {{ ucfirst($user->role ?? 'Admin') }} Dashboard
+            {{ ucfirst($user->role ?? 'Admin') }} {{ $sidebarSettings['sidebar.dashboard_label'] }}
         </span>
     </a>
 
@@ -155,6 +181,7 @@
 
         {{-- ── Main navigation ── --}}
         @foreach($navLinks as $link)
+            @continue(array_key_exists('visible', $link) && ! $link['visible'])
             @php
                 $hasChildren    = !empty($link['children']);
                 $linkActive     = $isActive($link['patterns']);
@@ -198,7 +225,7 @@
         @endforeach
 
         {{-- ── Admin dropdown (isAdmin only) ── --}}
-        @can('isAdmin')
+        @if($user->can('isAdmin') || $isDeveloperAdmin)
             @php
                 $adminActive = collect($adminChildren)->contains(function ($child) use ($isActive) {
                     if ($isActive($child['patterns'])) return true;
@@ -210,7 +237,7 @@
                         type="button" aria-expanded="{{ $adminActive ? 'true' : 'false' }}"
                         title="Admin">
                     <svg viewBox="0 0 24 24" aria-hidden="true">{!! $icon('shield') !!}</svg>
-                    <span>Admin</span>
+                    <span>{{ $isDeveloperAdmin ? 'Developer' : 'Admin' }}</span>
                     <svg class="admin-sidebar-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                 </button>
                 <div class="admin-sidebar-submenu">
@@ -256,7 +283,7 @@
                     @endforeach
                 </div>
             </div>
-        @endcan
+        @endif
 
     </nav>
 

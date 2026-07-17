@@ -66,7 +66,7 @@
     </div>
 
     <div class="al-table-wrap">
-        <table class="al-table">
+        <table class="al-table site-table">
             <thead>
                 <tr>
                     <th>Last Name</th>

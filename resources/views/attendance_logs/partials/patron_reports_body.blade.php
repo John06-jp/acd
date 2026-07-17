@@ -81,8 +81,8 @@
                 <div class="p-3 border-bottom">
                     <div style="height:280px;"><canvas id="chartTopIns"></canvas></div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-sm mb-0 align-middle">
+                <div class="table-responsive site-table-wrap">
+                    <table class="table table-sm mb-0 align-middle site-table">
                         <thead style="background:#e0f2fe;">
                             <tr>
                                 <th style="width:2.5rem;">#</th>
@@ -142,8 +142,8 @@
                 <div class="p-3 border-bottom">
                     <div style="height:280px;"><canvas id="chartDistinctDays"></canvas></div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-sm mb-0 align-middle">
+                <div class="table-responsive site-table-wrap">
+                    <table class="table table-sm mb-0 align-middle site-table">
                         <thead style="background:#d1fae5;">
                             <tr>
                                 <th style="width:2.5rem;">#</th>
@@ -204,8 +204,8 @@
                         <canvas id="chartProgramTotals"></canvas>
                     </div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-sm mb-0 align-middle">
+                <div class="table-responsive site-table-wrap">
+                    <table class="table table-sm mb-0 align-middle site-table">
                         <thead style="background:#ede9fe;">
                             <tr>
                                 <th>Program / course</th>
@@ -251,8 +251,8 @@
                 <div class="p-3 border-bottom">
                     <div style="height:280px;"><canvas id="chartWeeklyTrend"></canvas></div>
                 </div>
-                <div class="table-responsive" style="max-height:260px;">
-                    <table class="table table-sm mb-0 align-middle">
+                <div class="table-responsive site-table-wrap" style="max-height:260px;">
+                    <table class="table table-sm mb-0 align-middle site-table">
                         <thead style="background:#e0e7ff;" class="sticky-top">
                             <tr><th>Week</th><th class="text-end">INs</th></tr>
                         </thead>
@@ -291,8 +291,8 @@
                 <div class="p-3 border-bottom">
                     <div style="height:280px;"><canvas id="chartMonthlyTrend"></canvas></div>
                 </div>
-                <div class="table-responsive" style="max-height:260px;">
-                    <table class="table table-sm mb-0 align-middle">
+                <div class="table-responsive site-table-wrap" style="max-height:260px;">
+                    <table class="table table-sm mb-0 align-middle site-table">
                         <thead style="background:#fee2e2;" class="sticky-top">
                             <tr><th>Month</th><th class="text-end">INs</th></tr>
                         </thead>
@@ -332,8 +332,8 @@
                 <div class="p-3 border-bottom">
                     <div style="height:280px;"><canvas id="chartBusiestHour"></canvas></div>
                 </div>
-                <div class="table-responsive" style="max-height:260px;">
-                    <table class="table table-sm mb-0 align-middle">
+                <div class="table-responsive site-table-wrap" style="max-height:260px;">
+                    <table class="table table-sm mb-0 align-middle site-table">
                         <thead style="background:#ede9fe;" class="sticky-top">
                             <tr><th>Hour</th><th class="text-end">INs</th></tr>
                         </thead>

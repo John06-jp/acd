@@ -135,8 +135,8 @@
         @else
             <div class="card shadow-sm rounded-4 border-0">
                 <div class="card-body p-3">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
+                    <div class="table-responsive site-table-wrap">
+                        <table class="table table-hover align-middle site-table">
                             <thead class="table-light">
                                 <tr>
                                     <th style="width:48px">#</th>

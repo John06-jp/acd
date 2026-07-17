@@ -207,8 +207,8 @@
                 @endif
             </form>
 
-            <div class="table-responsive">
-                <table class="table table-hover accounts-table">
+            <div class="table-responsive site-table-wrap">
+                <table class="table table-hover accounts-table site-table">
                     <thead>
                         <tr>
                             <th>User</th>
