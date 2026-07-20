@@ -158,6 +158,10 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
     Route::put('/prospectus/program/{program}', [ProspectusController::class, 'updateProgram'])->name('prospectus.updateProgram');
     Route::delete('/prospectus/program/{program}', [ProspectusController::class, 'destroyProgram'])->name('prospectus.destroyProgram');
 
+});
+
+// Account management is available to library and developer administrators.
+Route::middleware(['auth', 'can:isAdminOrDeveloper'])->group(function () {
     Route::get('/view-users', [UserController::class, 'index'])->name('users.index');
     Route::get('/create-user', [UserController::class, 'create'])->name('users.create');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');

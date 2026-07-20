@@ -40,6 +40,25 @@ class SiteCustomizationFeatureTest extends TestCase
             ->assertOk()
             ->assertSeeText('Developer Dashboard')
             ->assertSee(route('site-customization.index'));
+
+        $this->actingAs($developer)
+            ->get(route('site-customization.index'))
+            ->assertSeeText('Change History')
+            ->assertSee(route('site-customization.index').'#change-history', false);
+    }
+
+    public function test_account_management_is_available_to_admin_and_developer_only(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $developer = User::factory()->create(['role' => 'admindeveloper']);
+        $staff = User::factory()->create(['role' => 'staff']);
+
+        $this->actingAs($admin)->get(route('users.create'))->assertOk();
+        $this->actingAs($developer)
+            ->get(route('users.create'))
+            ->assertOk()
+            ->assertSeeText('Create Account');
+        $this->actingAs($staff)->get(route('users.create'))->assertForbidden();
     }
 
     public function test_admin_can_save_a_section_and_revision_is_recorded(): void
@@ -149,6 +168,29 @@ class SiteCustomizationFeatureTest extends TestCase
 
         $this->assertSame('First', $service->get('login.title'));
         $this->assertDatabaseHas('setting_revisions', ['action' => 'restore', 'setting_key' => 'login.title']);
+    }
+
+    public function test_change_history_shows_field_values_and_is_paginated_by_batch(): void
+    {
+        $admin = User::factory()->create(['role' => 'admindeveloper']);
+        $service = app(SiteSettingsService::class);
+
+        for ($index = 1; $index <= 11; $index++) {
+            $service->set('login.title', "Title {$index}", $admin->id);
+        }
+
+        $this->actingAs($admin)
+            ->get(route('site-customization.index'))
+            ->assertOk()
+            ->assertSeeText('Change History')
+            ->assertSeeText('Login title')
+            ->assertSeeText('Title 11')
+            ->assertSee('history_page=2', false);
+
+        $this->actingAs($admin)
+            ->get(route('site-customization.index', ['history_page' => 2]))
+            ->assertOk()
+            ->assertSeeText('Title 1');
     }
 
     public function test_saved_content_renders_on_landing_and_login_pages(): void

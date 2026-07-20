@@ -76,6 +76,16 @@
         ];
         $adminChildren = [
             ['label' => 'Site Customization', 'route' => 'site-customization.index', 'patterns' => ['site-customization.*'], 'icon' => 'settings'],
+            ['label' => 'Change History', 'route' => 'site-customization.index', 'fragment' => 'change-history', 'patterns' => [], 'icon' => 'clock'],
+            [
+                'label'    => 'Accounts',
+                'icon'     => 'user-plus',
+                'patterns' => ['users.*'],
+                'children' => [
+                    ['label' => 'Create Account', 'route' => 'users.create', 'patterns' => ['users.create', 'users.store'], 'icon' => 'user-plus'],
+                    ['label' => 'View Accounts',  'route' => 'users.index',  'patterns' => ['users.index', 'users.edit'],   'icon' => 'list'],
+                ],
+            ],
         ];
     } else {
         $adminChildren = array_values(array_filter(
@@ -201,7 +211,7 @@
                     <div class="admin-sidebar-submenu">
                         @foreach($link['children'] as $child)
                             @php $childActive = $isActive($child['patterns']); @endphp
-                            <a href="{{ route($child['route']) }}"
+                            <a href="{{ route($child['route']).(isset($child['fragment']) ? '#'.$child['fragment'] : '') }}"
                                class="admin-sidebar-link admin-sidebar-link--child {{ $childActive ? 'active' : '' }}"
                                title="{{ $child['label'] }}"
                                @if(!empty($child['target'])) target="{{ $child['target'] }}" rel="noopener" @endif
@@ -272,7 +282,7 @@
                                 </div>
                             </div>
                         @else
-                            <a href="{{ route($child['route']) }}"
+                            <a href="{{ route($child['route']).(isset($child['fragment']) ? '#'.$child['fragment'] : '') }}"
                                class="admin-sidebar-link admin-sidebar-link--child {{ $childActive ? 'active' : '' }}"
                                title="{{ $child['label'] }}"
                                @if($childActive) aria-current="page" @endif>

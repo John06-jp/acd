@@ -18,6 +18,8 @@ class AuthServiceProvider extends ServiceProvider
 
         Gate::define('isAdminDeveloper', fn (User $user) => $user->role === 'admindeveloper');
 
+        Gate::define('isAdminOrDeveloper', fn (User $user) => in_array($user->role, ['admin', 'admindeveloper'], true));
+
         Gate::define('isStaff', fn (User $user) => $user->role === 'staff');
 
         Gate::define('isAdminOrStaff', fn (User $user) => in_array($user->role, ['admin', 'staff'])

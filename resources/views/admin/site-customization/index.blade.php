@@ -22,14 +22,22 @@
     .image-setting img { display:block; max-width:220px; max-height:100px; object-fit:contain; margin-bottom:.65rem; background:#f8fafc; border:1px solid #e5e7eb; border-radius:8px; }
     .section-actions { display:flex; gap:.5rem; justify-content:flex-end; flex-wrap:wrap; margin-top:1.25rem; }
     .revision-panel { margin-top:1rem; padding:1rem; }
+    .revision-batch { border-top:1px solid #edf2f7; padding:.85rem 0; }
     .revision-row { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.75rem 0; border-top:1px solid #edf2f7; }
+    .revision-summary { display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+    .revision-details { margin-top:.75rem; border:1px solid #e5e7eb; border-radius:10px; overflow-x:auto; }
+    .revision-details table { width:100%; margin:0; font-size:.85rem; }
+    .revision-details th, .revision-details td { padding:.6rem .7rem; border-bottom:1px solid #edf2f7; vertical-align:top; }
+    .revision-details tr:last-child td { border-bottom:0; }
+    .revision-value { display:block; max-width:360px; max-height:6rem; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; color:#334155; }
+    .revision-default { color:#64748b; font-style:italic; }
     .preview-frame { border:1px solid #cbd5e1; border-radius:12px; padding:1rem; background:#f8fafc; margin-top:1rem; overflow:hidden; }
     .preview-stage { width:100%; max-width:900px; margin:auto; transition:max-width .2s ease; }
     .preview-stage iframe { display:block; width:100%; height:500px; border:1px solid #cbd5e1; border-radius:10px; background:#fff; }
     .preview-toolbar { display:flex; gap:.4rem; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-bottom:.75rem; }
     .preview-scenes { display:flex; gap:.35rem; flex-wrap:wrap; }
     .preview-scenes button.active { background:#125a82; color:#fff; border-color:#125a82; }
-    @media (max-width:767px) { .settings-grid { grid-template-columns:1fr; } .customization-header { align-items:flex-start; } }
+    @media (max-width:767px) { .settings-grid { grid-template-columns:1fr; } .customization-header { align-items:flex-start; } .revision-summary { align-items:flex-start; flex-direction:column; } }
 </style>
 @endpush
 
@@ -138,12 +146,47 @@
         </div>
     </div>
 
-    <section class="revision-panel">
-        <h2 class="h5">Recent Changes</h2>
+    <section class="revision-panel" id="change-history">
+        <h2 class="h5 mb-1">Change History</h2>
+        <p class="small text-muted">Review published setting changes and restore the values that existed before any batch.</p>
         @forelse($revisionBatches as $batch => $revisions)
-            @php $first = $revisions->first(); @endphp
+            @php
+                $first = $revisions->first();
+                $historyValue = static function (?string $value, string $key) use ($definitions): array {
+                    if ($value === null) return ['Factory default', true];
+                    $type = $definitions[$key]['type'] ?? 'string';
+                    if ($type === 'boolean') return [$value === '1' ? 'Enabled' : 'Disabled', false];
+                    if ($type === 'json') {
+                        $decoded = json_decode($value, true);
+                        if (is_array($decoded)) return [json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), false];
+                    }
+                    return [$value === '' ? '(empty)' : $value, false];
+                };
+            @endphp
             <div class="revision-row"><div><strong>{{ ucfirst(str_replace('_',' ', $first->action)) }}</strong><div class="small text-muted">{{ $first->user?->email ?? 'System' }} · {{ $first->created_at->diffForHumans() }} · {{ $revisions->count() }} setting(s)</div></div><form method="POST" action="{{ route('site-customization.restore', $batch) }}" data-confirm="Restore the values from before this change batch?">@csrf<button class="btn btn-sm btn-outline-secondary" type="submit">Restore previous</button></form></div>
+            <details class="revision-details">
+                <summary class="px-3 py-2">View field-by-field changes</summary>
+                <table>
+                    <thead><tr><th scope="col">Setting</th><th scope="col">Previous value</th><th scope="col">New value</th></tr></thead>
+                    <tbody>
+                    @foreach($revisions as $revision)
+                        @php
+                            [$previousValue, $previousDefault] = $historyValue($revision->previous_value, $revision->setting_key);
+                            [$newValue, $newDefault] = $historyValue($revision->new_value, $revision->setting_key);
+                        @endphp
+                        <tr>
+                            <td><strong>{{ $definitions[$revision->setting_key]['label'] ?? Str::headline($revision->setting_key) }}</strong><div class="text-muted">{{ $revision->setting_key }}</div></td>
+                            <td><span class="revision-value {{ $previousDefault ? 'revision-default' : '' }}">{{ $previousValue }}</span></td>
+                            <td><span class="revision-value {{ $newDefault ? 'revision-default' : '' }}">{{ $newValue }}</span></td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </details>
         @empty <p class="text-muted mb-0">No customization changes have been published yet.</p> @endforelse
+        @if($historyPage->hasPages())
+            <div class="mt-3">{{ $historyPage->links() }}</div>
+        @endif
     </section>
 
     <form method="POST" action="{{ route('site-customization.update-all') }}" class="d-none" data-all-form>@csrf @method('PUT')</form>

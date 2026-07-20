@@ -21,18 +21,28 @@ class SiteCustomizationController extends Controller
 
     public function index(): View
     {
+        $historyPage = SettingRevision::query()
+            ->selectRaw('batch_uuid, MAX(created_at) as latest_at')
+            ->groupBy('batch_uuid')
+            ->orderByDesc('latest_at')
+            ->paginate(10, ['*'], 'history_page')
+            ->withQueryString();
+
+        $batchOrder = array_flip($historyPage->pluck('batch_uuid')->all());
         $revisionBatches = SettingRevision::query()
             ->with('user')
-            ->latest()
+            ->whereIn('batch_uuid', $historyPage->pluck('batch_uuid'))
+            ->orderBy('id')
             ->get()
             ->groupBy('batch_uuid')
-            ->take(15);
+            ->sortBy(static fn ($revisions, $batch) => $batchOrder[$batch] ?? PHP_INT_MAX);
 
         return view('admin.site-customization.index', [
             'groups' => config('site-customization.groups'),
             'definitions' => $this->settings->definitions(),
             'values' => $this->settings->all(),
             'revisionBatches' => $revisionBatches,
+            'historyPage' => $historyPage,
         ]);
     }
 
