@@ -42,12 +42,12 @@ class SiteCustomizationFeatureTest extends TestCase
             ->assertSee(route('site-customization.index'));
 
         $this->actingAs($developer)
-            ->get(route('site-customization.index'))
+            ->get(route('developer.dashboard'))
             ->assertSeeText('Change History')
-            ->assertSee(route('site-customization.index').'#change-history', false);
+            ->assertSee(route('site-customization.history'), false);
     }
 
-    public function test_account_creation_is_admin_only_while_developer_can_view_accounts(): void
+    public function test_account_management_is_hidden_from_and_forbidden_to_developer(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
         $developer = User::factory()->create(['role' => 'admindeveloper']);
@@ -55,12 +55,25 @@ class SiteCustomizationFeatureTest extends TestCase
 
         $this->actingAs($admin)->get(route('users.create'))->assertOk();
         $this->actingAs($developer)
-            ->get(route('users.index'))
+            ->get(route('developer.dashboard'))
             ->assertOk()
-            ->assertSeeText('User Accounts')
-            ->assertDontSeeText('Create Account');
+            ->assertDontSeeText('Accounts');
+        $this->actingAs($developer)->get(route('users.index'))->assertForbidden();
         $this->actingAs($developer)->get(route('users.create'))->assertForbidden();
         $this->actingAs($staff)->get(route('users.create'))->assertForbidden();
+    }
+
+    public function test_deleting_an_account_keeps_a_soft_deleted_database_record(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $account = User::factory()->create(['role' => 'staff']);
+
+        $this->actingAs($admin)
+            ->delete(route('users.destroy', $account))
+            ->assertRedirect(route('users.index'));
+
+        $this->assertSoftDeleted('users', ['id' => $account->id]);
+        $this->assertNotNull(User::withTrashed()->find($account->id));
     }
 
     public function test_admin_can_save_a_section_and_revision_is_recorded(): void
@@ -182,7 +195,7 @@ class SiteCustomizationFeatureTest extends TestCase
         }
 
         $this->actingAs($admin)
-            ->get(route('site-customization.index'))
+            ->get(route('site-customization.history'))
             ->assertOk()
             ->assertSeeText('Change History')
             ->assertSeeText('Login title')
@@ -190,7 +203,7 @@ class SiteCustomizationFeatureTest extends TestCase
             ->assertSee('history_page=2', false);
 
         $this->actingAs($admin)
-            ->get(route('site-customization.index', ['history_page' => 2]))
+            ->get(route('site-customization.history', ['history_page' => 2]))
             ->assertOk()
             ->assertSeeText('Title 1');
     }

@@ -146,6 +146,7 @@
         </div>
     </div>
 
+    @if(false)
     <section class="revision-panel" id="change-history">
         <h2 class="h5 mb-1">Change History</h2>
         <p class="small text-muted">Review published setting changes and restore the values that existed before any batch.</p>
@@ -188,6 +189,7 @@
             <div class="mt-3">{{ $historyPage->links() }}</div>
         @endif
     </section>
+    @endif
 
     <form method="POST" action="{{ route('site-customization.update-all') }}" class="d-none" data-all-form>@csrf @method('PUT')</form>
 </div>

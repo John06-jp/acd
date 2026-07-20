@@ -115,6 +115,7 @@ Route::middleware(['auth', 'can:isAdminDeveloper'])->prefix('developer')->group(
 
     Route::prefix('site-customization')->name('site-customization.')->group(function () {
         Route::get('/', [SiteCustomizationController::class, 'index'])->name('index');
+        Route::get('/history', [SiteCustomizationController::class, 'history'])->name('history');
         Route::put('/', [SiteCustomizationController::class, 'updateAll'])->name('update-all');
         Route::put('/section/{group}', [SiteCustomizationController::class, 'updateSection'])->name('update-section');
         Route::post('/images/{key}', [SiteCustomizationController::class, 'upload'])->name('images.upload');
@@ -160,15 +161,12 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
 
 });
 
-// Account management is available to library and developer administrators.
-Route::middleware(['auth', 'can:isAdminOrDeveloper'])->group(function () {
+// Account management is available to library administrators only.
+Route::middleware(['auth', 'can:isAdmin'])->group(function () {
     Route::get('/view-users', [UserController::class, 'index'])->name('users.index');
     Route::get('/edit-user/{id}', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/update-user/{id}', [UserController::class, 'update'])->name('users.update');
     Route::delete('/delete-user/{id}', [UserController::class, 'destroy'])->name('users.destroy');
-});
-
-Route::middleware(['auth', 'can:isAdmin'])->group(function () {
     Route::get('/create-user', [UserController::class, 'create'])->name('users.create');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
 });

@@ -76,15 +76,7 @@
         ];
         $adminChildren = [
             ['label' => 'Site Customization', 'route' => 'site-customization.index', 'patterns' => ['site-customization.*'], 'icon' => 'settings'],
-            ['label' => 'Change History', 'route' => 'site-customization.index', 'fragment' => 'change-history', 'patterns' => [], 'icon' => 'clock'],
-            [
-                'label'    => 'Accounts',
-                'icon'     => 'user-plus',
-                'patterns' => ['users.*'],
-                'children' => [
-                    ['label' => 'View Accounts',  'route' => 'users.index',  'patterns' => ['users.index', 'users.edit'],   'icon' => 'list'],
-                ],
-            ],
+            ['label' => 'Change History', 'route' => 'site-customization.history', 'patterns' => ['site-customization.history'], 'icon' => 'clock'],
         ];
     } else {
         $adminChildren = array_values(array_filter(
