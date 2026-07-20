@@ -181,9 +181,11 @@
     <div class="accounts-card">
         <div class="accounts-card-header">
             <h4>User Accounts</h4>
-            <a href="{{ route('users.create') }}" class="btn btn-sm btn-add" style="background:#fff; color:var(--brand-primary-darker,#125a82); font-weight:700; font-size:0.8rem; border-radius:8px; border:none;">
-                + Create Account
-            </a>
+            @can('isAdmin')
+                <a href="{{ route('users.create') }}" class="btn btn-sm btn-add" style="background:#fff; color:var(--brand-primary-darker,#125a82); font-weight:700; font-size:0.8rem; border-radius:8px; border:none;">
+                    + Create Account
+                </a>
+            @endcan
         </div>
 
         <div class="accounts-card-body">

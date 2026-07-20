@@ -163,9 +163,12 @@ Route::middleware(['auth', 'can:isAdmin'])->group(function () {
 // Account management is available to library and developer administrators.
 Route::middleware(['auth', 'can:isAdminOrDeveloper'])->group(function () {
     Route::get('/view-users', [UserController::class, 'index'])->name('users.index');
-    Route::get('/create-user', [UserController::class, 'create'])->name('users.create');
-    Route::post('/users', [UserController::class, 'store'])->name('users.store');
     Route::get('/edit-user/{id}', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/update-user/{id}', [UserController::class, 'update'])->name('users.update');
     Route::delete('/delete-user/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+});
+
+Route::middleware(['auth', 'can:isAdmin'])->group(function () {
+    Route::get('/create-user', [UserController::class, 'create'])->name('users.create');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
 });

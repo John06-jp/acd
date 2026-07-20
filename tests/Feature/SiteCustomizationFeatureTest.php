@@ -47,7 +47,7 @@ class SiteCustomizationFeatureTest extends TestCase
             ->assertSee(route('site-customization.index').'#change-history', false);
     }
 
-    public function test_account_management_is_available_to_admin_and_developer_only(): void
+    public function test_account_creation_is_admin_only_while_developer_can_view_accounts(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
         $developer = User::factory()->create(['role' => 'admindeveloper']);
@@ -55,9 +55,11 @@ class SiteCustomizationFeatureTest extends TestCase
 
         $this->actingAs($admin)->get(route('users.create'))->assertOk();
         $this->actingAs($developer)
-            ->get(route('users.create'))
+            ->get(route('users.index'))
             ->assertOk()
-            ->assertSeeText('Create Account');
+            ->assertSeeText('User Accounts')
+            ->assertDontSeeText('Create Account');
+        $this->actingAs($developer)->get(route('users.create'))->assertForbidden();
         $this->actingAs($staff)->get(route('users.create'))->assertForbidden();
     }
 

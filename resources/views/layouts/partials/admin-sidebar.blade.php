@@ -82,7 +82,6 @@
                 'icon'     => 'user-plus',
                 'patterns' => ['users.*'],
                 'children' => [
-                    ['label' => 'Create Account', 'route' => 'users.create', 'patterns' => ['users.create', 'users.store'], 'icon' => 'user-plus'],
                     ['label' => 'View Accounts',  'route' => 'users.index',  'patterns' => ['users.index', 'users.edit'],   'icon' => 'list'],
                 ],
             ],
